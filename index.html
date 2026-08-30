@@ -169,7 +169,7 @@
   <div class="mast">
     <div>
       <h1>매집 계기반</h1>
-      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver">BUILD 2026-08-30 R19</span></div>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver">BUILD 2026-08-30 R21</span></div>
     </div>
     <div class="total">
       <div class="n" id="totalN">—</div>
@@ -882,24 +882,27 @@
   let _dt, lastFetch=null;
   function freshness(){
     const box=$('freshBox'); if(!box)return;
-    const parts=[];
     const now=Date.now();
-    if(lastFetch){
-      const h=(now-new Date(lastFetch).getTime())/36e5;
-      parts.push({h, txt:`시세 갱신 ${h<1?'방금':(h<24?Math.floor(h)+'시간 전':Math.floor(h/24)+'일 전')}`});
-    } else parts.push({h:999, txt:'시세 미갱신'});
-    let recTxt='주간 채점 기록 없음', recH=999;
+    const fh = lastFetch ? (now-new Date(lastFetch).getTime())/36e5 : null;
+    const fTxt = fh===null ? '시세 미갱신'
+      : (fh<1?'시세 갱신 방금':(fh<24?`시세 갱신 ${Math.floor(fh)}시간 전`:`시세 갱신 ${Math.floor(fh/24)}일 전`));
+    let rTxt='주간 채점 미저장', rd=null;
     if(records.length){
       const last=records[records.length-1].date;
-      const dd=Math.floor((now-new Date(last+'T00:00:00').getTime())/864e5);
-      recH=dd*24; recTxt=`주간 채점 ${dd===0?'오늘':dd+'일 전'} (${last})`;
+      rd=Math.floor((now-new Date(last+'T00:00:00').getTime())/864e5);
+      rTxt=`주간 채점 ${rd===0?'오늘':rd+'일 전'} (${last})`;
     }
-    parts.push({h:recH, txt:recTxt});
-    const worst=Math.max(...parts.map(x=>x.h));
-    const line=parts.map(x=>x.txt).join(' · ');
-    if(worst>=24*8) box.innerHTML=`<div class="flag warn" style="margin:0 0 14px"><b>데이터가 오래됐습니다</b> — ${line}. 계기판 수치는 과거 값입니다.</div>`;
-    else if(worst>=24*2) box.innerHTML=`<div class="flag warn" style="margin:0 0 14px">${line} — 「시세 자동 불러오기」로 갱신하십시오.</div>`;
-    else box.innerHTML=`<div class="flag ok" style="margin:0 0 14px">${line}</div>`;
+    const line=`${fTxt} · ${rTxt}`;
+    const fetchBad = (fh===null) || fh>=48;
+    const recBad = (rd!==null && rd>=8);
+    if(fetchBad&&fh!==null || recBad)
+      box.innerHTML=`<div class="flag warn" style="margin:0 0 14px"><b>데이터가 오래됐습니다</b> — ${line}. 계기판 수치는 과거 값입니다.</div>`;
+    else if(fh===null)
+      box.innerHTML=`<div class="flag warn" style="margin:0 0 14px">${line} — 「비트코인 채점」 탭에서 <b>시세 자동 불러오기</b>를 눌러 주십시오.</div>`;
+    else if(rd===null)
+      box.innerHTML=`<div class="flag ok" style="margin:0 0 14px">${line} — 수동 항목을 채운 뒤 <b>이번 주 저장</b>을 누르면 기록이 시작됩니다.</div>`;
+    else
+      box.innerHTML=`<div class="flag ok" style="margin:0 0 14px">${line}</div>`;
   }
   function saveDraft(){
     clearTimeout(_dt);
@@ -1160,7 +1163,9 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   $('btnJson').onclick=async()=>{
     await out('bak',`매집계기반_백업_${new Date().toISOString().slice(0,10)}.json`,'application/json',
       JSON.stringify({records,rows,daily,ladder:{total:+$('l_total').value,dca:+$('l_dca').value,res:+$('l_res').value,lad},
-      links:{fx:+$('i_fx').value,up:+$('i_upbit').value,bi:+$('i_bithumb').value,bn:+$('i_binance').value},nav:+$('i_nav').value,cash:+$('i_cash').value},null,2));
+      links:{fx:+$('i_fx').value,up:+$('i_upbit').value,bi:+$('i_bithumb').value,bn:+$('i_binance').value},
+      draft:(()=>{const o={};Object.keys(RAWMAP).forEach(k=>o[k]=$(RAWMAP[k]).value);
+        o._base=$('i_base').value; o._fetched=lastFetch||''; return o;})(),nav:+$('i_nav').value,cash:+$('i_cash').value},null,2));
   };
 
   $('btnLoad').onclick=()=>$('fileIn').click();
@@ -1174,6 +1179,12 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
         records=o.records;
         if(Array.isArray(o.rows)&&o.rows.length)rows=o.rows;
         if(Array.isArray(o.daily)){daily=o.daily; await sSet(DAYKEY,JSON.stringify(daily)); renderDaily();}
+        if(o.draft){const D=o.draft;
+          Object.keys(RAWMAP).forEach(k=>{ if(D[k]!==undefined&&D[k]!=='') $(RAWMAP[k]).value=D[k]; });
+          if(D._base) $('i_base').value=D._base;
+          if(D._fetched) lastFetch=D._fetched;
+          await sSet(DKEY,JSON.stringify(D));
+        }
         if(o.links){const L=o.links;
           if(L.fx!=null)$('i_fx').value=L.fx; if(L.up!=null)$('i_upbit').value=L.up;
           if(L.bi!=null)$('i_bithumb').value=L.bi; if(L.bn!=null)$('i_binance').value=L.bn; renderLinks();}
@@ -1182,7 +1193,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
         if(typeof o.nav==='number')$('i_nav').value=o.nav;
         if(typeof o.cash==='number')$('i_cash').value=o.cash;
         await saveRec(); await savePort();
-        drawLog(); renderPortfolio();
+        render(); drawLog(); renderPortfolio(); renderLinks(); freshness();
         toast(`복원 완료 · 기록 ${records.length}건`,'var(--ok)','toast2');
       }catch(err){
         toast('이 파일은 읽을 수 없습니다. 이 앱에서 내보낸 .json 백업인지 확인하세요.','var(--alarm)','toast2');
@@ -1198,8 +1209,8 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   async function jget(u){const r=await fetch(u,{cache:'no-store'}); if(!r.ok)throw new Error(r.status); return r.json();}
   $('btnFetch').onclick=async()=>{
     const btn=$('btnFetch'); btn.disabled=true; btn.textContent='불러오는 중…';
-    const log=[]; let px=null;
-    const ok=(n,v)=>log.push(`<span style="color:var(--ok)">✓</span> ${n} · ${v}`);
+    const log=[]; let px=null, okN=0;
+    const ok=(n,v)=>{okN++; log.push(`<span style="color:var(--ok)">✓</span> ${n} · ${v}`);};
     const ng=n=>log.push(`<span style="color:var(--alarm)">✗</span> ${n} 실패 — 직접 입력하십시오`);
 
     try{
@@ -1250,8 +1261,13 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
 
     $('fetchLog').innerHTML=log.join('<br>')+
       '<br><span style="color:var(--dim)">MVRV · SOPR · ETF 3종 · 거래소 보유량 · M2 · Fed는 직접 입력하십시오.</span>';
-    lastFetch=new Date().toISOString();
-    $('fetchTime').textContent=new Date().toLocaleString('ko-KR',{hour12:false}).slice(0,16);
+    if(okN>0){
+      lastFetch=new Date().toISOString();
+      $('fetchTime').textContent=new Date().toLocaleString('ko-KR',{hour12:false}).slice(0,16);
+    } else {
+      $('fetchTime').textContent='조회 실패';
+      log.push('<span style="color:var(--alarm)">전체 실패</span> — 네트워크 또는 API 차단일 수 있습니다. 값을 직접 입력하십시오.');
+    }
     btn.disabled=false; btn.textContent='시세 자동 불러오기';
     render(); freshness();
   };
