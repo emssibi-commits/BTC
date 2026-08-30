@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>매집 계기반</title>
+<style>
+  :root{
+    --bg:#0E1419; --panel:#161E26; --panel2:#1C262F; --line:#2A3742;
+    --text:#DCE4EC; --dim:#7C8C9B; --phos:#F5A623;
+    --ok:#3DD68C; --standby:#5C9CE0; --caution:#E8B33A; --warn:#E8873A; --alarm:#E5484D;
+    --mono:ui-monospace,"SFMono-Regular","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; background:#0E1419}
+  .rig{background:var(--bg); color:var(--text); font-family:var(--sans);
+    padding:18px; border-radius:10px; line-height:1.5; font-size:14px;
+    max-width:1240px; margin:0 auto; -webkit-font-smoothing:antialiased}
+  .rig h1,.rig h2,.rig h3{margin:0; font-weight:700}
+  .rig button{font-family:inherit; cursor:pointer}
+  .rig :focus-visible{outline:2px solid var(--phos); outline-offset:2px}
+
+  .mast{display:flex; align-items:flex-end; justify-content:space-between;
+    gap:16px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:14px}
+  .mast h1{font-size:19px; letter-spacing:.14em}
+  .mast .sub{color:var(--dim); font-size:11px; letter-spacing:.22em; margin-top:5px; font-family:var(--mono)}
+  .total{text-align:right}
+  .total .n{font-family:var(--mono); font-size:52px; font-weight:700; line-height:.9;
+    letter-spacing:-.02em; font-variant-numeric:tabular-nums; transition:color .25s}
+  .total .d{color:var(--dim); font-size:11px; font-family:var(--mono); letter-spacing:.18em; margin-top:6px}
+
+  .tabs{display:flex; gap:5px; margin-bottom:16px; border-bottom:1px solid var(--line)}
+  .tabs button{background:none; border:0; border-bottom:2px solid transparent; color:var(--dim);
+    padding:9px 15px; font-size:12.5px; letter-spacing:.1em; margin-bottom:-1px; border-radius:0}
+  .tabs button:hover{color:var(--text)}
+  .tabs button.on{color:var(--phos); border-bottom-color:var(--phos)}
+  .pane{display:none} .pane.on{display:block}
+
+  .grid{display:grid; grid-template-columns:1.35fr 1fr; gap:16px; align-items:start}
+  .grid-p{grid-template-columns:1fr 340px}
+  @media(max-width:860px){
+    .grid,.grid-p{grid-template-columns:1fr}
+    .rig{padding:11px}
+    .mast h1{font-size:16px} .total .n{font-size:40px}
+    .tabs{overflow-x:auto} .tabs button{padding:9px 11px; white-space:nowrap}
+    .row{grid-template-columns:1fr 80px 66px; gap:7px}
+    .rig input,.rig select{padding:8px 7px; font-size:16px}
+    .ptab input,.ptab select{font-size:15px; padding:6px}
+    .btns button{flex:1 1 auto; min-height:40px}
+  }
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px 15px; margin-bottom:14px}
+  .card > header{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:12px}
+  .card h2{font-size:12px; letter-spacing:.2em; color:var(--dim)}
+  .secscore{font-family:var(--mono); font-size:15px; font-variant-numeric:tabular-nums}
+  .secscore b{color:var(--phos); font-weight:700} .secscore span{color:var(--dim); font-size:11px}
+
+  .row{display:grid; grid-template-columns:1fr 88px 74px; gap:10px; align-items:center;
+    padding:7px 0; border-top:1px solid rgba(42,55,66,.55)}
+  .row:first-of-type{border-top:0}
+  .row .lab{font-size:13px}
+  .row .lab em{display:block; font-style:normal; color:var(--dim); font-size:10.5px;
+    font-family:var(--mono); margin-top:2px}
+  .rig input,.rig select{width:100%; background:var(--panel2); border:1px solid var(--line);
+    color:var(--text); border-radius:4px; padding:6px 7px; font-family:var(--mono);
+    font-size:13px; font-variant-numeric:tabular-nums; text-align:right}
+  .rig select{text-align:left; font-family:var(--sans); font-size:12px}
+  .rig input:hover,.rig select:hover{border-color:#3B4B59}
+  .pts{display:flex; align-items:center; justify-content:flex-end; gap:6px}
+  .pts .v{font-family:var(--mono); font-size:13px; min-width:26px; text-align:right}
+  .bars{display:flex; gap:1.5px}
+  .bars i{width:3px; height:13px; background:#26313B; border-radius:1px; transition:background .2s}
+  .bars i.on{background:var(--phos)} .bars i.neg{background:var(--alarm)}
+  .derived{font-family:var(--mono); font-size:11px; color:var(--dim); text-align:center; padding:6px 0 0}
+  .derived b{color:var(--phos); font-weight:600}
+
+  .dial{background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(255,255,255,.012) 3px 4px),var(--panel);
+    border:1px solid var(--line); border-radius:8px; padding:16px 15px 14px; margin-bottom:14px}
+  .dial svg{display:block; width:100%; height:auto}
+  .needle{transition:transform .55s cubic-bezier(.34,1.3,.5,1); transform-origin:150px 132px}
+  @media(prefers-reduced-motion:reduce){.needle{transition:none}.total .n{transition:none}}
+  .verdict{text-align:center}
+  .verdict .tier{font-size:22px; font-weight:700; letter-spacing:.06em}
+  .verdict .act{color:var(--dim); font-size:12px; margin-top:4px; font-family:var(--mono)}
+  .deploy{display:flex; align-items:center; justify-content:space-between; gap:12px;
+    border-top:1px solid var(--line); margin-top:14px; padding-top:12px}
+  .deploy label{font-size:11px; color:var(--dim); letter-spacing:.14em; font-family:var(--mono)}
+  .deploy input{width:132px; margin-top:4px}
+  .amt{text-align:right}
+  .amt .n{font-family:var(--mono); font-size:24px; font-weight:700; font-variant-numeric:tabular-nums}
+  .amt .u{color:var(--dim); font-size:10px; font-family:var(--mono); letter-spacing:.16em; margin-top:3px}
+
+  .ammo{display:flex; flex-direction:column; gap:7px}
+  .lock{display:flex; align-items:center; gap:9px; background:var(--panel2);
+    border:1px solid var(--line); border-radius:5px; padding:9px 11px}
+  .dot{width:8px; height:8px; border-radius:50%; background:#3A4854; flex:none}
+  .lock .t{font-size:12.5px; flex:1}
+  .lock .t em{display:block; font-style:normal; color:var(--dim); font-size:10.5px; font-family:var(--mono); margin-top:2px}
+  .lock .s{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; color:var(--dim)}
+  .exit{margin-top:10px; border:1px solid var(--line); border-radius:5px; padding:10px 11px; background:var(--panel2)}
+  .exit .hd{display:flex; justify-content:space-between; font-size:11px; letter-spacing:.16em;
+    color:var(--dim); font-family:var(--mono); margin-bottom:8px}
+  .exit ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:5px}
+  .exit li{display:flex; align-items:center; gap:8px; font-size:12px; font-family:var(--mono)}
+  .exit li .dot{width:6px;height:6px}
+  .exit li.hit{color:var(--alarm)} .exit li.hit .dot{background:var(--alarm)}
+
+  .btns{display:flex; gap:8px; flex-wrap:wrap}
+  .rig button.b{background:var(--panel2); color:var(--text); border:1px solid var(--line);
+    border-radius:5px; padding:8px 13px; font-size:12px; transition:.15s}
+  .rig button.b:hover{border-color:var(--phos); color:var(--phos)}
+  .rig button.primary{background:var(--phos); color:#12181D; border-color:var(--phos); font-weight:700}
+  .rig button.primary:hover{filter:brightness(1.1); color:#12181D}
+  .rig button.ghost{color:var(--dim)}
+  .rig button.ghost:hover{border-color:var(--alarm); color:var(--alarm)}
+  .rig button.mini{padding:3px 8px; font-size:11px; background:none; border:1px solid var(--line);
+    color:var(--dim); border-radius:4px}
+  .rig button.mini:hover{border-color:var(--alarm); color:var(--alarm)}
+  .rig button.mini.edit:hover{border-color:var(--phos); color:var(--phos)}
+
+  table{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:11.5px; font-variant-numeric:tabular-nums}
+  th{color:var(--dim); font-weight:400; text-align:right; padding:6px 5px;
+    border-bottom:1px solid var(--line); letter-spacing:.08em; font-size:10px; white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  td{padding:5px; border-bottom:1px solid rgba(42,55,66,.5); text-align:right}
+  .scroll{max-height:280px; overflow:auto}
+  .xscroll{overflow-x:auto}
+  .note{color:var(--dim); font-size:11.5px; margin-top:10px; line-height:1.6}
+  .empty{color:var(--dim); font-size:12.5px; text-align:center; padding:26px 10px; line-height:1.7}
+  .toast{color:var(--ok); font-size:11.5px; font-family:var(--mono); min-height:16px; margin-top:9px}
+  .flag{border-radius:5px; padding:9px 11px; font-size:12px; margin-top:9px; line-height:1.55}
+  .flag.warn{background:rgba(232,135,58,.1); border:1px solid rgba(232,135,58,.4); color:#F0A76E}
+  .flag.ok{background:rgba(61,214,140,.08); border:1px solid rgba(61,214,140,.3); color:var(--ok)}
+  .ptab input,.ptab select{padding:4px 6px; font-size:11.5px}
+  .ptab td{padding:4px 4px}
+  .chip{display:inline-block; padding:2px 7px; border-radius:3px; font-size:10px; letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="rig">
+  <div class="mast">
+    <div>
+      <h1>매집 계기반</h1>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT</div>
+    </div>
+    <div class="total">
+      <div class="n" id="totalN">—</div>
+      <div class="d">TOTAL SCORE</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="on" data-tab="p1">비트코인 채점</button>
+    <button data-tab="p2">포트폴리오 배분</button>
+    <button data-tab="p3">기록 · 내보내기</button>
+  </div>
+
+  <!-- ================= PANE 1 ================= -->
+  <div class="pane on" id="p1">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <header><h2>A · 사이클 위치</h2><div class="secscore"><b id="sA">0</b><span>/40</span></div></header>
+        <div class="row"><div class="lab">BTC 가격 <em>USD, 천 단위</em></div><input id="i_price" type="number" step="0.01" value="77.83"><div></div></div>
+        <div class="row"><div class="lab">200주 이동평균 <em>USD, 천 단위</em></div><input id="i_ma" type="number" step="0.01" value="64.43"><div></div></div>
+        <div class="derived">가격 ÷ 200주MA = <b id="d_ratio">—</b></div>
+        <div class="row" style="border-top:1px solid rgba(42,55,66,.55); margin-top:6px">
+          <div class="lab">200주MA 배수 <em>≤0.95 → 15pt</em></div>
+          <div style="font-family:var(--mono);text-align:right;font-size:13px" id="d_ratio2">—</div>
+          <div class="pts"><div class="bars" data-bars="ratio"></div><div class="v" id="p_ratio">0</div></div></div>
+        <div class="row"><div class="lab">MVRV 비율 <em>≤1.00 → 15pt</em></div><input id="i_mvrv" type="number" step="0.01" value="1.47">
+          <div class="pts"><div class="bars" data-bars="mvrv"></div><div class="v" id="p_mvrv">0</div></div></div>
+        <div class="row"><div class="lab">메이어 멀티플 <em>≤0.75 → 10pt</em></div><input id="i_mayer" type="number" step="0.001" value="1.1">
+          <div class="pts"><div class="bars" data-bars="mayer"></div><div class="v" id="p_mayer">0</div></div></div>
+      </div>
+
+      <div class="card">
+        <header><h2>B · 시장 심리</h2><div class="secscore"><b id="sB">0</b><span>/25</span></div></header>
+        <div class="row"><div class="lab">공포/탐욕 지수 <em>≤15 → 10pt · 76+ → −3pt</em></div><input id="i_fg" type="number" step="1" value="73">
+          <div class="pts"><div class="bars" data-bars="fg"></div><div class="v" id="p_fg">0</div></div></div>
+        <div class="row"><div class="lab">SOPR <em>≤0.97 → 8pt</em></div><input id="i_sopr" type="number" step="0.001" value="1.0">
+          <div class="pts"><div class="bars" data-bars="sopr"></div><div class="v" id="p_sopr">0</div></div></div>
+        <div class="row"><div class="lab">국내 프리미엄 % <em>≤−1.5 → 7pt · +5 초과 → −3pt</em></div><input id="i_prem" type="number" step="0.01" value="0.325">
+          <div class="pts"><div class="bars" data-bars="prem"></div><div class="v" id="p_prem">0</div></div></div>
+      </div>
+
+      <div class="card">
+        <header><h2>C · 수급</h2><div class="secscore"><b id="sC">0</b><span>/25</span></div></header>
+        <div class="row"><div class="lab">ETF 누적 보유량 방향 <em>증가 → 8pt</em></div>
+          <select id="i_etfcum"><option value="2">증가</option><option value="1">횡보</option><option value="0">감소</option></select>
+          <div class="pts"><div class="bars" data-bars="etfcum"></div><div class="v" id="p_etfcum">0</div></div></div>
+        <div class="row"><div class="lab">ETF 4주 누적 순유입 <em>순유입 → 7pt</em></div>
+          <select id="i_etf4"><option value="2">순유입</option><option value="1">혼조</option><option value="0">순유출</option></select>
+          <div class="pts"><div class="bars" data-bars="etf4"></div><div class="v" id="p_etf4">0</div></div></div>
+        <div class="row"><div class="lab">거래소 스테이블코인 4주 <em>증가 → 5pt</em></div>
+          <select id="i_stable"><option value="2">증가</option><option value="1">횡보</option><option value="0">감소</option></select>
+          <div class="pts"><div class="bars" data-bars="stable"></div><div class="v" id="p_stable">0</div></div></div>
+        <div class="row"><div class="lab">거래소 BTC 보유량 4주 <em>감소(축적) → 5pt</em></div>
+          <select id="i_exch"><option value="2">감소 · 축적</option><option value="1">횡보</option><option value="0">증가 · 분배</option></select>
+          <div class="pts"><div class="bars" data-bars="exch"></div><div class="v" id="p_exch">0</div></div></div>
+      </div>
+
+      <div class="card">
+        <header><h2>D · 매크로</h2><div class="secscore"><b id="sD">0</b><span>/10</span></div></header>
+        <div class="row"><div class="lab">Global M2 전월비 % <em>+1 이상 → 5pt</em></div><input id="i_m2" type="number" step="0.1" value="0.7">
+          <div class="pts"><div class="bars" data-bars="m2"></div><div class="v" id="p_m2">0</div></div></div>
+        <div class="row"><div class="lab">DXY <em>≤96 → 3pt</em></div><input id="i_dxy" type="number" step="0.01" value="99.67">
+          <div class="pts"><div class="bars" data-bars="dxy"></div><div class="v" id="p_dxy">0</div></div></div>
+        <div class="row"><div class="lab">Fed 정책 <em>인하 → 2pt</em></div>
+          <select id="i_fed"><option value="2">인하</option><option value="1" selected>동결</option><option value="0">인상</option></select>
+          <div class="pts"><div class="bars" data-bars="fed"></div><div class="v" id="p_fed">0</div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="dial">
+        <svg viewBox="0 0 300 152" role="img" aria-label="이번 주 매수 배속 계기판">
+          <defs><linearGradient id="arcg" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#E5484D"/><stop offset="22%" stop-color="#E8873A"/>
+            <stop offset="46%" stop-color="#E8B33A"/><stop offset="70%" stop-color="#5C9CE0"/>
+            <stop offset="100%" stop-color="#3DD68C"/></linearGradient></defs>
+          <path d="M 30 132 A 120 120 0 0 1 270 132" fill="none" stroke="#232E38" stroke-width="16" stroke-linecap="round"/>
+          <path d="M 30 132 A 120 120 0 0 1 270 132" fill="none" stroke="url(#arcg)" stroke-width="16" stroke-linecap="round" opacity=".9"/>
+          <g id="ticks" stroke="#0E1419" stroke-width="2"></g>
+          <g class="needle" id="needle">
+            <line x1="150" y1="132" x2="150" y2="34" stroke="#F5A623" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="150" cy="132" r="7" fill="#F5A623"/><circle cx="150" cy="132" r="3" fill="#161E26"/></g>
+          <g id="ticklabels" font-family="ui-monospace,monospace" font-size="9" fill="#7C8C9B" text-anchor="middle"></g>
+        </svg>
+        <div class="verdict"><div class="tier" id="tierN">—</div><div class="act" id="tierAct">수치를 입력하세요</div></div>
+        <div class="deploy">
+          <div><label for="i_base">주간 기본 매수액 (만원)</label><br><input id="i_base" type="number" step="1" value="100"></div>
+          <div class="amt"><div class="n" id="amtN">—</div><div class="u">이번 주 집행액 · 만원</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <header><h2>탄약 3층 상태</h2></header>
+        <div class="ammo">
+          <div class="lock" id="lk1"><div class="dot"></div><div class="t">1층 · 기본 DCA <em>예산 40% · 항상 가동</em></div><div class="s">OPEN</div></div>
+          <div class="lock" id="lk2"><div class="dot"></div><div class="t">2층 · 조건부 트랑쉐 <em>예산 40% · 52점 이상</em></div><div class="s">—</div></div>
+          <div class="lock" id="lk3"><div class="dot"></div><div class="t">3층 · 항복 예비 <em>예산 20% · 70점 or 200MA하회+공포15</em></div><div class="s">—</div></div>
+        </div>
+        <div class="exit">
+          <div class="hd"><span>익절 경보</span><span id="exitCount">0 / 4</span></div>
+          <ul>
+            <li id="x1"><span class="dot"></span>MVRV ≥ 2.40</li>
+            <li id="x2"><span class="dot"></span>메이어 멀티플 ≥ 2.00</li>
+            <li id="x3"><span class="dot"></span>공포/탐욕 ≥ 85</li>
+            <li id="x4"><span class="dot"></span>국내 프리미엄 ≥ +5.0%</li>
+          </ul>
+          <div class="note" id="exitMsg" style="margin-top:9px">2개 이상 충족 시 보유량 20% 분할 익절.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <header><h2>기록 저장</h2></header>
+        <div class="row" style="grid-template-columns:1fr 130px; border:0; padding:0 0 11px">
+          <div class="lab">기준일</div><input id="i_date" type="date"></div>
+        <div class="btns">
+          <button class="b primary" id="btnSave">이번 주 저장</button>
+          <button class="b" id="btnSeed">백테스트 15주</button>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ================= PANE 2 ================= -->
+  <div class="pane" id="p2">
+    <div class="grid grid-p">
+      <div class="card">
+        <header><h2>보유 자산 · 목표 대비 괴리</h2>
+          <div class="btns"><button class="b" id="btnAdd">행 추가</button><button class="b ghost" id="btnReset">기본값 복원</button></div>
+        </header>
+        <div class="xscroll">
+          <table class="ptab"><thead><tr>
+            <th style="min-width:96px">종목</th><th style="min-width:112px">등급</th>
+            <th>목표%</th><th>현재%</th><th>괴리%</th><th>평단</th><th>현재가</th><th>손익%</th>
+            <th style="min-width:96px">조치</th><th></th>
+          </tr></thead><tbody id="pbody"></tbody></table>
+        </div>
+        <div class="note" id="wsum">—</div>
+        <div id="flags"></div>
+      </div>
+
+      <div>
+        <div class="card">
+          <header><h2>연동 규칙</h2></header>
+          <div class="row" style="grid-template-columns:1fr 120px; border:0; padding:0 0 8px">
+            <div class="lab">총 평가액 <em>만원</em></div><input id="i_nav" type="number" step="10" value="10000"></div>
+          <div class="row" style="grid-template-columns:1fr 120px; padding:8px 0 0">
+            <div class="lab">현금 목표 비중 <em>%</em></div><input id="i_cash" type="number" step="1" value="45"></div>
+          <div class="note">알트·크립토 주식은 BTC 사이클에 후행하고 변동폭이 더 큽니다. 그래서 자산군별로 <b style="color:var(--phos)">개방 점수(게이트)</b>를 다르게 두고, BTC 점수가 그 아래면 신규 매수를 잠급니다.</div>
+        </div>
+        <div class="card">
+          <header><h2>자산군 게이트</h2><div class="secscore"><span id="gateScore">—</span></div></header>
+          <div class="ammo" id="gates"></div>
+          <div class="note">AI 전력 인프라는 크립토 사이클과 상관이 낮아 게이트를 걸지 않습니다. 별도 DCA로 운용하십시오.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PANE 3 ================= -->
+  <div class="pane" id="p3">
+    <div class="card">
+      <header><h2>점수 · 가격 추이</h2><div class="secscore"><span id="recCount">0건</span></div></header>
+      <div id="chartWrap"><div class="empty">저장된 기록이 없습니다.</div></div>
+      <div class="scroll" id="tableWrap"></div>
+    </div>
+    <div class="card">
+      <header><h2>내보내기</h2></header>
+      <div class="btns">
+        <button class="b primary" id="btnXls">엑셀 내보내기 (.xls · 4시트)</button>
+        <button class="b" id="btnCsv">CSV 내보내기 (주간기록)</button>
+        <button class="b" id="btnJson">백업 파일 (.json)</button>
+        <button class="b" id="btnLoad">백업 불러오기</button>
+        <input id="fileIn" type="file" accept=".json,application/json" style="display:none">
+        <button class="b ghost" id="btnClear">기록 전체 삭제</button>
+      </div>
+      <div class="toast" id="toast2"></div>
+      <div class="note">엑셀 파일은 <b>주간기록 / 포트폴리오 / 채점기준 / 자산군게이트</b> 4개 시트로 나옵니다.
+        열 때 "형식이 다르다"는 안내가 뜨면 <b>[예]</b>를 누르시면 정상적으로 열립니다.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const KEY='btcscore:records', PKEY='btcscore:portfolio';
+
+  /* ---------- scoring ---------- */
+  const band=(v,p,l)=>{for(const[t,s]of p)if(v<=t)return s;return l};
+  const S={
+    ratio:v=>band(v,[[0.95,15],[1.00,13],[1.05,11],[1.15,7],[1.25,3]],0),
+    mvrv:v=>band(v,[[1.00,15],[1.15,12],[1.25,9],[1.40,5],[1.60,2]],0),
+    mayer:v=>band(v,[[0.75,10],[0.85,8],[1.00,5],[1.15,3],[1.40,1]],0),
+    fg:v=>band(v,[[15,10],[25,8],[40,5],[60,2],[75,0]],-3),
+    sopr:v=>band(v,[[0.97,8],[0.99,6],[1.01,3],[1.03,1]],0),
+    prem:v=>band(v,[[-1.5,7],[-0.5,5],[1,2],[5,0]],-3),
+    m2:v=>v>=1?5:(v>=0?3:0), dxy:v=>band(v,[[96,3],[100,2]],0),
+    etfcum:v=>[0,4,8][v], etf4:v=>[1,4,7][v], stable:v=>[0,3,5][v], exch:v=>[0,3,5][v], fed:v=>[0,1,2][v]
+  };
+  const MAX={ratio:15,mvrv:15,mayer:10,fg:10,sopr:8,prem:7,etfcum:8,etf4:7,stable:5,exch:5,m2:5,dxy:3,fed:2};
+  const TIERS=[
+    {min:70,name:'항복존',act:'예비 탄약 일괄 투입',mult:'ALL',color:'--ok'},
+    {min:60,name:'적극 매집',act:'주간 기본액 × 3',mult:3,color:'--ok'},
+    {min:52,name:'확대 매집',act:'주간 기본액 × 2',mult:2,color:'--standby'},
+    {min:44,name:'중립',act:'주간 기본액 × 1',mult:1,color:'--caution'},
+    {min:36,name:'감속',act:'주간 기본액 × 0.5',mult:0.5,color:'--warn'},
+    {min:-99,name:'중단',act:'신규 매수 정지 · 익절 검토',mult:0,color:'--alarm'}];
+  const tierOf=s=>TIERS.find(t=>s>=t.min);
+  const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  /* ---------- asset classes ---------- */
+  const CLASSES={
+    core:   {name:'코어 코인',      gate:44, k:1.0,  note:'BTC · ETH'},
+    large:  {name:'대형 알트',      gate:52, k:0.7,  note:'SOL · XRP · LINK'},
+    small:  {name:'소형 알트',      gate:60, k:0.4,  note:'ENA · ARB · ONDO · XLM'},
+    equity: {name:'크립토 주식',    gate:52, k:0.6,  note:'COIN · HOOD · CRCL'},
+    infra:  {name:'AI 전력 인프라', gate:null,k:1.0, note:'ETN · VRT · BE · 487230'}
+  };
+  const DEFAULT_ROWS=[
+    ['BTC','core',22,0,0,0],['ETH','core',10,0,0,0],
+    ['SOL','large',5,0,0,0],['XRP','large',4,0,0,0],['LINK','large',4,0,0,0],
+    ['ONDO','small',2,0,0,0],['XLM','small',2,0,0,0],['ENA','small',1,0,0,0],['ARB','small',1,0,0,0],
+    ['COIN','equity',3,0,0,0],['HOOD','equity',3,0,0,0],['CRCL','equity',2,0,0,0],
+    ['Eaton (ETN)','infra',3,0,0,0],['Vertiv (VRT)','infra',3,0,0,0],
+    ['Bloom Energy (BE)','infra',2,0,0,0],['KODEX 487230','infra',3,0,0,0]
+  ];
+
+  /* ---------- dial ticks ---------- */
+  (function(){const g=$('ticks'),gl=$('ticklabels');
+    [[0,'중단'],[36,'0.5×'],[44,'1×'],[52,'2×'],[60,'3×'],[70,'일괄'],[100,'']].forEach(([s,lab])=>{
+      const a=(-90+s*1.8)*Math.PI/180;
+      const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+      l.setAttribute('x1',150+Math.sin(a)*112); l.setAttribute('y1',132-Math.cos(a)*112);
+      l.setAttribute('x2',150+Math.sin(a)*128); l.setAttribute('y2',132-Math.cos(a)*128); g.appendChild(l);
+      if(!lab)return;
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',150+Math.sin(a)*97); t.setAttribute('y',132-Math.cos(a)*97+3);
+      t.textContent=lab; gl.appendChild(t);});})();
+
+  function bars(k,pts){const el=document.querySelector(`[data-bars="${k}"]`);if(!el)return;
+    let h=''; if(pts<0){for(let i=0;i<Math.min(3,-pts);i++)h+='<i class="neg"></i>';}
+    else for(let i=0;i<MAX[k];i++)h+=`<i class="${i<pts?'on':''}"></i>`; el.innerHTML=h;}
+
+  const read=()=>({price:+$('i_price').value,ma:+$('i_ma').value,mvrv:+$('i_mvrv').value,
+    mayer:+$('i_mayer').value,fg:+$('i_fg').value,sopr:+$('i_sopr').value,prem:+$('i_prem').value,
+    etfcum:+$('i_etfcum').value,etf4:+$('i_etf4').value,stable:+$('i_stable').value,
+    exch:+$('i_exch').value,m2:+$('i_m2').value,dxy:+$('i_dxy').value,fed:+$('i_fed').value});
+
+  function score(d){
+    const ratio=d.ma>0?d.price/d.ma:NaN;
+    const p={ratio:S.ratio(ratio),mvrv:S.mvrv(d.mvrv),mayer:S.mayer(d.mayer),fg:S.fg(d.fg),
+      sopr:S.sopr(d.sopr),prem:S.prem(d.prem),etfcum:S.etfcum(d.etfcum),etf4:S.etf4(d.etf4),
+      stable:S.stable(d.stable),exch:S.exch(d.exch),m2:S.m2(d.m2),dxy:S.dxy(d.dxy),fed:S.fed(d.fed)};
+    const A=p.ratio+p.mvrv+p.mayer,B=p.fg+p.sopr+p.prem,C=p.etfcum+p.etf4+p.stable+p.exch,D=p.m2+p.dxy+p.fed;
+    return{p,ratio,A,B,C,D,total:A+B+C+D};
+  }
+
+  let LAST={total:0,ratio:0};
+  function render(){
+    const d=read(); if(Object.values(d).some(v=>isNaN(v)))return;
+    const r=score(d); LAST=r;
+    Object.keys(r.p).forEach(k=>{const e=$('p_'+k); if(e)e.textContent=r.p[k]; bars(k,r.p[k]);});
+    $('d_ratio').textContent=r.ratio.toFixed(4)+' 배'; $('d_ratio2').textContent=r.ratio.toFixed(3);
+    $('sA').textContent=r.A;$('sB').textContent=r.B;$('sC').textContent=r.C;$('sD').textContent=r.D;
+    const t=tierOf(r.total),col=cssv(t.color);
+    $('totalN').textContent=r.total; $('totalN').style.color=col;
+    $('tierN').textContent=t.name; $('tierN').style.color=col; $('tierAct').textContent=t.act;
+    $('needle').style.transform=`rotate(${Math.max(0,Math.min(100,r.total))*1.8-90}deg)`;
+    const base=+$('i_base').value||0;
+    $('amtN').textContent=t.mult==='ALL'?'일괄':(base*t.mult).toLocaleString('ko-KR');
+    $('amtN').style.color=col;
+    const l3=r.total>=70||(r.ratio<=1.0&&d.fg<=15);
+    [['lk1',true],['lk2',r.total>=52],['lk3',l3]].forEach(([id,on])=>{
+      const el=$(id),dot=el.querySelector('.dot'),s=el.querySelector('.s');
+      dot.style.background=on?'var(--ok)':'#3A4854';
+      el.style.borderColor=on?'rgba(61,214,140,.4)':'var(--line)';
+      s.textContent=on?'OPEN':'LOCKED'; s.style.color=on?'var(--ok)':'var(--dim)';});
+    const hits=[d.mvrv>=2.4,d.mayer>=2.0,d.fg>=85,d.prem>=5];
+    hits.forEach((h,i)=>$('x'+(i+1)).classList.toggle('hit',h));
+    const n=hits.filter(Boolean).length;
+    $('exitCount').textContent=n+' / 4'; $('exitCount').style.color=n>=2?'var(--alarm)':'var(--dim)';
+    $('exitMsg').textContent=n>=2?'2개 이상 충족 — 보유량 20% 분할 익절 실행 구간입니다.':'2개 이상 충족 시 보유량 20% 분할 익절.';
+    $('exitMsg').style.color=n>=2?'var(--alarm)':'var(--dim)';
+    renderGates();
+  }
+
+  /* ---------- portfolio ---------- */
+  let rows=[];
+  function rowHTML(r,i){
+    const opts=Object.keys(CLASSES).map(k=>`<option value="${k}"${r.cls===k?' selected':''}>${CLASSES[k].name}</option>`).join('');
+    const gap=(r.tgt-r.cur);
+    const pl=(r.avg>0&&r.px>0)?((r.px/r.avg-1)*100):null;
+    const t=tierOf(LAST.total||0), g=CLASSES[r.cls].gate;
+    const open=(g===null)||((LAST.total||0)>=g);
+    let act,col;
+    if(gap>0.5&&open){act='매수';col='var(--ok)';}
+    else if(gap>0.5&&!open){act='대기 · 잠김';col='var(--dim)';}
+    else if(gap<-0.5){act='비중 축소';col='var(--warn)';}
+    else {act='유지';col='var(--dim)';}
+    return `<tr data-i="${i}">
+      <td><input data-f="name" value="${r.name}" style="text-align:left"></td>
+      <td><select data-f="cls">${opts}</select></td>
+      <td><input data-f="tgt" type="number" step="0.5" value="${r.tgt}"></td>
+      <td><input data-f="cur" type="number" step="0.5" value="${r.cur}"></td>
+      <td style="color:${gap>0.5?'var(--ok)':(gap<-0.5?'var(--warn)':'var(--dim)')}">${gap>0?'+':''}${gap.toFixed(1)}</td>
+      <td><input data-f="avg" type="number" step="0.01" value="${r.avg}"></td>
+      <td><input data-f="px" type="number" step="0.01" value="${r.px}"></td>
+      <td style="color:${pl===null?'var(--dim)':(pl>=0?'var(--ok)':'var(--alarm)')}">${pl===null?'—':(pl>0?'+':'')+pl.toFixed(1)}</td>
+      <td style="text-align:right;color:${col}">${act}</td>
+      <td><button class="mini" data-del="${i}">×</button></td></tr>`;
+  }
+  function renderPortfolio(){
+    $('pbody').innerHTML=rows.map(rowHTML).join('');
+    const nav=+$('i_nav').value||0, cash=+$('i_cash').value||0;
+    const tgt=rows.reduce((a,r)=>a+r.tgt,0), cur=rows.reduce((a,r)=>a+r.cur,0);
+    $('wsum').innerHTML=`목표 합계 <b style="color:${Math.abs(tgt+cash-100)<0.6?'var(--ok)':'var(--warn)'}">${tgt.toFixed(1)}%</b>
+      + 현금 ${cash}% = <b>${(tgt+cash).toFixed(1)}%</b> · 현재 보유 합계 ${cur.toFixed(1)}%
+      · 1%p = ${(nav/100).toLocaleString('ko-KR')}만원`;
+    // flags
+    const byCls={}; rows.forEach(r=>byCls[r.cls]=(byCls[r.cls]||0)+r.cur);
+    const f=[];
+    const eq=byCls.equity||0;
+    if(eq>12) f.push(`<div class="flag warn"><b>집중도 경고</b> — 크립토 주식 ${eq.toFixed(1)}%.
+      COIN · HOOD · CRCL은 <b>거래량 = 매출</b>이라는 동일 팩터를 공유합니다. 분산이 아니라 한 종목을 셋으로 쪼갠 것에 가깝습니다.</div>`);
+    const alt=(byCls.large||0)+(byCls.small||0);
+    if(alt>0&&(LAST.total||0)<52) f.push(`<div class="flag warn"><b>알트 게이트 잠김</b> — BTC ${LAST.total||0}점.
+      알트 신규 매수는 52점 이상에서만 개방됩니다. 지금은 기존 보유분 관리 구간입니다.</div>`);
+    if(Math.abs(tgt+cash-100)>0.6) f.push(`<div class="flag warn"><b>비중 합계 불일치</b> — 목표 + 현금이 100%가 아닙니다.</div>`);
+    if(!f.length) f.push(`<div class="flag ok">비중 합계 정상 · 집중도 경고 없음</div>`);
+    $('flags').innerHTML=f.join('');
+    savePort();
+  }
+  function renderGates(){
+    $('gateScore').textContent='BTC '+(LAST.total||0)+'점';
+    $('gates').innerHTML=Object.keys(CLASSES).map(k=>{
+      const c=CLASSES[k], open=(c.gate===null)||((LAST.total||0)>=c.gate);
+      const t=tierOf(LAST.total||0);
+      const mult=(t.mult==='ALL')?'일괄':(t.mult*c.k).toFixed(2).replace(/\.?0+$/,'')+'×';
+      return `<div class="lock" style="border-color:${open?'rgba(61,214,140,.4)':'var(--line)'}">
+        <div class="dot" style="background:${open?'var(--ok)':'#3A4854'}"></div>
+        <div class="t">${c.name} <em>${c.note} · 게이트 ${c.gate===null?'비연동':c.gate+'점'}</em></div>
+        <div class="s" style="color:${open?'var(--ok)':'var(--dim)'}">${open?(c.gate===null?'DCA':mult):'LOCKED'}</div></div>`;
+    }).join('');
+  }
+  $('pbody').addEventListener('input',e=>{
+    const tr=e.target.closest('tr'); if(!tr)return;
+    const i=+tr.dataset.i, f=e.target.dataset.f; if(!f)return;
+    rows[i][f]=(f==='name'||f==='cls')?e.target.value:(+e.target.value||0);
+    if(f==='name')return; renderPortfolio();
+  });
+  $('pbody').addEventListener('change',e=>{if(e.target.dataset.f==='cls')renderPortfolio();});
+  $('pbody').addEventListener('click',e=>{
+    if(e.target.dataset.del===undefined)return;
+    rows.splice(+e.target.dataset.del,1); renderPortfolio();});
+  $('btnAdd').onclick=()=>{rows.push({name:'신규',cls:'large',tgt:0,cur:0,avg:0,px:0});renderPortfolio();};
+  $('btnReset').onclick=()=>{rows=DEFAULT_ROWS.map(a=>({name:a[0],cls:a[1],tgt:a[2],cur:a[3],avg:a[4],px:a[5]}));renderPortfolio();};
+  ['i_nav','i_cash'].forEach(id=>$(id).addEventListener('input',renderPortfolio));
+
+  /* ---------- storage (artifact sandbox → local file → memory) ---------- */
+  const isFile = location.protocol==='file:';
+  const mem={};
+  async function sGet(k){
+    if(window.storage){try{const r=await window.storage.get(k);return r?r.value:null;}catch(e){}}
+    if(isFile){try{return window.localStorage.getItem(k);}catch(e){}}
+    return mem[k]||null;
+  }
+  async function sSet(k,v){
+    mem[k]=v;
+    if(window.storage){try{await window.storage.set(k,v);return;}catch(e){}}
+    if(isFile){try{window.localStorage.setItem(k,v);}catch(e){}}
+  }
+
+  let records=[];
+  async function loadAll(){
+    const a=await sGet(KEY); records=a?JSON.parse(a):[];
+    const b=await sGet(PKEY);
+    rows=b?JSON.parse(b):DEFAULT_ROWS.map(x=>({name:x[0],cls:x[1],tgt:x[2],cur:x[3],avg:x[4],px:x[5]}));
+    renderPortfolio(); drawLog();
+  }
+  const saveRec=()=>sSet(KEY,JSON.stringify(records));
+  const savePort=()=>sSet(PKEY,JSON.stringify(rows));
+  function toast(m,c,id){const t=$(id||'toast');t.textContent=m;t.style.color=c||'var(--ok)';
+    clearTimeout(t._t);t._t=setTimeout(()=>t.textContent='',3400);}
+
+  $('btnSave').onclick=async()=>{
+    const d=read(),r=score(d),date=$('i_date').value||new Date().toISOString().slice(0,10);
+    records=records.filter(x=>x.date!==date);
+    records.push({date,raw:d,price:d.price,ma:d.ma,mvrv:d.mvrv,mayer:d.mayer,fg:d.fg,sopr:d.sopr,prem:d.prem,
+      total:r.total,A:r.A,B:r.B,C:r.C,D:r.D,tier:tierOf(r.total).name});
+    records.sort((a,b)=>a.date<b.date?-1:1);
+    await saveRec(); drawLog(); toast(`${date} 저장 · ${r.total}점`);
+  };
+  $('btnClear').onclick=async()=>{
+    if(!records.length)return toast('삭제할 기록이 없습니다.','var(--dim)','toast2');
+    records=[];await saveRec();drawLog();toast('기록을 모두 삭제했습니다.','var(--dim)','toast2');};
+
+  const SEED=[
+    ['2026-05-22',75.49,61.26,1.40,0.934,28,0.989,-0.90,1,0,1,0,0.0,99.32],
+    ['2026-05-29',71.37,61.53,1.36,0.934,22,0.967,-1.60,1,0,0,0,0.0,99.32],
+    ['2026-06-06',60.87,61.78,1.13,0.774,12,0.971,-1.70,0,0,1,0,0.0,100.11],
+    ['2026-06-13',63.54,61.95,1.20,0.774,13,0.999,-0.50,1,0,1,0,0.0,100.11],
+    ['2026-06-19',63.54,62.15,1.18,0.825,14,0.984,-1.70,0,0,0,1,0.0,100.85],
+    ['2026-06-26',60.02,62.36,1.13,0.825,13,0.971,-1.70,1,0,0,0,0.0,100.85],
+    ['2026-07-03',62.54,62.56,1.18,0.834,22,1.000,-1.50,0,0,0,0,2.3,100.86],
+    ['2026-07-10',64.13,62.78,1.21,0.837,22,0.972,-1.20,1,1,0,1,0.0,100.97],
+    ['2026-07-17',63.90,62.99,1.21,0.837,27,0.981,-0.30,2,2,0,0,0.0,100.97],
+    ['2026-07-24',64.10,63.20,1.21,0.837,28,0.987,-0.645,0,2,0,1,0.0,100.97],
+    ['2026-07-31',62.80,63.40,1.19,0.876,25,0.989,0.002,1,1,0,0,-0.6,99.80],
+    ['2026-08-07',64.88,63.67,1.23,0.876,29,0.992,-0.95,2,1,2,0,-0.6,99.80],
+    ['2026-08-14',63.40,63.86,1.20,0.906,29,0.995,-0.36,1,1,0,0,2.5,99.65],
+    ['2026-08-21',78.34,64.13,1.49,1.100,72,1.000,-1.10,2,2,2,0,0.0,98.80],
+    ['2026-08-28',77.83,64.43,1.47,1.100,73,1.000,0.325,2,2,2,0,0.7,99.67]];
+  $('btnSeed').onclick=async()=>{
+    SEED.forEach(a=>{
+      const d={price:a[1],ma:a[2],mvrv:a[3],mayer:a[4],fg:a[5],sopr:a[6],prem:a[7],
+        etfcum:a[8],etf4:a[9],stable:a[10],exch:a[11],m2:a[12],dxy:a[13],fed:1};
+      const r=score(d); records=records.filter(x=>x.date!==a[0]);
+      records.push({date:a[0],raw:d,price:a[1],ma:a[2],mvrv:a[3],mayer:a[4],fg:a[5],sopr:a[6],prem:a[7],
+        total:r.total,A:r.A,B:r.B,C:r.C,D:r.D,tier:tierOf(r.total).name});});
+    records.sort((x,y)=>x.date<y.date?-1:1);
+    await saveRec(); drawLog(); toast('백테스트 15주를 불러왔습니다.');
+  };
+
+  /* ---------- chart + table ---------- */
+  function drawLog(){
+    $('recCount').textContent=records.length+'건';
+    const wrap=$('chartWrap'),tw=$('tableWrap');
+    if(!records.length){wrap.innerHTML='<div class="empty">저장된 기록이 없습니다.<br>「비트코인 채점」 탭에서 저장하거나 백테스트 15주를 불러오세요.</div>';tw.innerHTML='';return;}
+    const W=1000,H=250,PL=44,PR=48,PT=16,PB=26,n=records.length;
+    const xs=i=>n===1?W/2:PL+i*(W-PL-PR)/(n-1);
+    const pV=records.map(r=>r.price),pMin=Math.min(...pV)*.97,pMax=Math.max(...pV)*1.03;
+    const ys=v=>PT+(1-v/100)*(H-PT-PB);
+    const yp=v=>PT+(1-(v-pMin)/(pMax-pMin))*(H-PT-PB);
+    const path=(a,f)=>a.map((v,i)=>(i?'L':'M')+xs(i).toFixed(1)+' '+f(v).toFixed(1)).join(' ');
+    const zones=[[70,100,'#3DD68C'],[60,70,'#3DD68C'],[52,60,'#5C9CE0'],[44,52,'#E8B33A'],[36,44,'#E8873A'],[0,36,'#E5484D']];
+    let bg=zones.map(([a,b,c])=>`<rect x="${PL}" y="${ys(b)}" width="${W-PL-PR}" height="${ys(a)-ys(b)}" fill="${c}" opacity=".05"/>`).join('');
+    bg+=[36,44,52,60,70].map(v=>`<line x1="${PL}" y1="${ys(v)}" x2="${W-PR}" y2="${ys(v)}" stroke="#2A3742" stroke-dasharray="3 4"/><text x="${PL-7}" y="${ys(v)+3}" fill="#7C8C9B" font-size="10" font-family="ui-monospace,monospace" text-anchor="end">${v}</text>`).join('');
+    const dots=records.map((r,i)=>`<circle cx="${xs(i).toFixed(1)}" cy="${ys(r.total).toFixed(1)}" r="4" fill="${cssv(tierOf(r.total).color)}"><title>${r.date} · ${r.total}점 · ${r.tier}</title></circle>`).join('');
+    const labs=records.map((r,i)=>(n>10&&i%2)?'':`<text x="${xs(i).toFixed(1)}" y="${H-8}" fill="#7C8C9B" font-size="9.5" font-family="ui-monospace,monospace" text-anchor="middle">${r.date.slice(5)}</text>`).join('');
+    wrap.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">${bg}
+      <path d="${path(pV,yp)}" fill="none" stroke="#7C8C9B" stroke-width="2" stroke-dasharray="5 4" opacity=".85"/>
+      <path d="${path(records.map(r=>r.total),ys)}" fill="none" stroke="#F5A623" stroke-width="2.5"/>${dots}${labs}
+      <text x="${W-PR+7}" y="${yp(pMax)+10}" fill="#7C8C9B" font-size="10" font-family="ui-monospace,monospace">${pMax.toFixed(0)}k</text>
+      <text x="${W-PR+7}" y="${yp(pMin)}" fill="#7C8C9B" font-size="10" font-family="ui-monospace,monospace">${pMin.toFixed(0)}k</text></svg>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:6px;font-family:var(--mono);font-size:10.5px;color:var(--dim)">
+      <span><span style="display:inline-block;width:14px;height:2.5px;background:#F5A623;vertical-align:middle"></span> 매집 점수</span>
+      <span><span style="display:inline-block;width:14px;height:2px;background:#7C8C9B;vertical-align:middle"></span> BTC 가격</span></div>`;
+    tw.innerHTML=`<table><thead><tr><th>기준일</th><th>가격</th><th>MVRV</th><th>공포탐욕</th>
+      <th>A</th><th>B</th><th>C</th><th>D</th><th>총점</th><th style="text-align:right">판정</th><th></th></tr></thead><tbody>${
+      records.slice().reverse().map(r=>{const c=cssv(tierOf(r.total).color);
+      return `<tr><td>${r.date}</td><td>${r.price.toFixed(2)}k</td><td>${(r.mvrv??0).toFixed(2)}</td><td>${r.fg??'—'}</td>
+        <td>${r.A}</td><td>${r.B}</td><td>${r.C}</td><td>${r.D}</td>
+        <td style="color:${c};font-weight:700">${r.total}</td><td style="text-align:right;color:${c}">${r.tier}</td>
+        <td style="text-align:right;white-space:nowrap"><button class="mini edit" data-load="${r.date}">수정</button>
+        <button class="mini" data-del2="${r.date}">×</button></td></tr>`;}).join('')}</tbody></table>`;
+  }
+
+  const RAWMAP={price:'i_price',ma:'i_ma',mvrv:'i_mvrv',mayer:'i_mayer',fg:'i_fg',sopr:'i_sopr',
+    prem:'i_prem',etfcum:'i_etfcum',etf4:'i_etf4',stable:'i_stable',exch:'i_exch',m2:'i_m2',dxy:'i_dxy',fed:'i_fed'};
+  function loadRecord(date){
+    const rec=records.find(x=>x.date===date); if(!rec)return;
+    if(!rec.raw) return toast('이 기록에는 원본 입력값이 없습니다. 값을 새로 입력해 같은 날짜로 저장하면 덮어써집니다.','var(--warn)','toast2');
+    Object.keys(RAWMAP).forEach(k=>{ if(rec.raw[k]!==undefined) $(RAWMAP[k]).value=rec.raw[k]; });
+    $('i_date').value=date; render();
+    document.querySelector('.tabs button[data-tab="p1"]').click();
+    window.scrollTo({top:0,behavior:'smooth'});
+    toast(`${date} 기록을 불러왔습니다. 값을 고친 뒤 「이번 주 저장」을 누르면 덮어써집니다.`);
+  }
+  $('tableWrap').addEventListener('click',async e=>{
+    const L=e.target.dataset.load, D=e.target.dataset.del2;
+    if(L){ loadRecord(L); }
+    else if(D){ records=records.filter(x=>x.date!==D); await saveRec(); drawLog();
+      toast(`${D} 기록을 삭제했습니다.`,'var(--dim)','toast2'); }
+  });
+
+  /* ---------- export ---------- */
+  function dl(name,mime,content){
+    const b=new Blob([content],{type:mime}), u=URL.createObjectURL(b);
+    const a=document.createElement('a'); a.href=u; a.download=name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),2000);
+  }
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const cell=v=>typeof v==='number'&&isFinite(v)
+    ? `<Cell><Data ss:Type="Number">${v}</Data></Cell>`
+    : `<Cell><Data ss:Type="String">${esc(v??'')}</Data></Cell>`;
+  const sheet=(name,rows)=>`<Worksheet ss:Name="${esc(name)}"><Table>${
+    rows.map(r=>`<Row>${r.map(cell).join('')}</Row>`).join('')}</Table></Worksheet>`;
+
+  $('btnXls').onclick=()=>{
+    const today=new Date().toISOString().slice(0,10);
+    const s1=[['기준일','BTC가격(k)','200주MA(k)','MA배수','MVRV','메이어','공포탐욕','SOPR','김프%',
+      'A 사이클','B 심리','C 수급','D 매크로','총점','판정'],
+      ...records.map(r=>[r.date,r.price,r.ma??'',r.ma?+(r.price/r.ma).toFixed(4):'',r.mvrv??'',r.mayer??'',
+        r.fg??'',r.sopr??'',r.prem??'',r.A,r.B,r.C,r.D,r.total,r.tier])];
+    const nav=+$('i_nav').value||0;
+    const s2=[['종목','등급','게이트','목표%','현재%','괴리%p','괴리금액(만원)','평단','현재가','손익%'],
+      ...rows.map(r=>{const c=CLASSES[r.cls],g=r.tgt-r.cur;
+        return [r.name,c.name,c.gate===null?'비연동':c.gate,r.tgt,r.cur,+g.toFixed(2),
+          +(g*nav/100).toFixed(1),r.avg,r.px,(r.avg>0&&r.px>0)?+((r.px/r.avg-1)*100).toFixed(2):''];})];
+    const s3=[['영역','지표','배점','구간 → 점수'],
+      ['A 사이클(40)','200주MA 배수',15,'≤0.95:15 / ≤1.00:13 / ≤1.05:11 / ≤1.15:7 / ≤1.25:3 / 초과:0'],
+      ['A 사이클(40)','MVRV',15,'≤1.00:15 / ≤1.15:12 / ≤1.25:9 / ≤1.40:5 / ≤1.60:2 / 초과:0'],
+      ['A 사이클(40)','메이어 멀티플',10,'≤0.75:10 / ≤0.85:8 / ≤1.00:5 / ≤1.15:3 / ≤1.40:1 / 초과:0'],
+      ['B 심리(25)','공포/탐욕',10,'≤15:10 / ≤25:8 / ≤40:5 / ≤60:2 / ≤75:0 / 초과:-3'],
+      ['B 심리(25)','SOPR',8,'≤0.97:8 / ≤0.99:6 / ≤1.01:3 / ≤1.03:1 / 초과:0'],
+      ['B 심리(25)','국내 프리미엄%',7,'≤-1.5:7 / ≤-0.5:5 / ≤1:2 / ≤5:0 / 초과:-3'],
+      ['C 수급(25)','ETF 누적 방향',8,'증가:8 / 횡보:4 / 감소:0'],
+      ['C 수급(25)','ETF 4주 순유입',7,'순유입:7 / 혼조:4 / 순유출:1'],
+      ['C 수급(25)','스테이블 4주',5,'증가:5 / 횡보:3 / 감소:0'],
+      ['C 수급(25)','거래소 BTC 4주',5,'감소(축적):5 / 횡보:3 / 증가(분배):0'],
+      ['D 매크로(10)','Global M2 전월비',5,'+1% 이상:5 / 0~1%:3 / 감소:0'],
+      ['D 매크로(10)','DXY',3,'≤96:3 / ≤100:2 / 초과:0'],
+      ['D 매크로(10)','Fed',2,'인하:2 / 동결:1 / 인상:0'],
+      [],['총점 구간','판정','배속','비고'],
+      ['70 이상','항복존','일괄','3층 예비 탄약 투입'],
+      ['60~69','적극 매집','×3','2·3층 개방'],
+      ['52~59','확대 매집','×2','2층 개방'],
+      ['44~51','중립','×1','1층만'],
+      ['36~43','감속','×0.5','1층만'],
+      ['35 이하','중단','0','신규 정지 · 익절 검토']];
+    const s4=[['자산군','구성','개방 게이트(BTC 점수)','배속 계수','현재 상태'],
+      ...Object.keys(CLASSES).map(k=>{const c=CLASSES[k];
+        const open=(c.gate===null)||((LAST.total||0)>=c.gate);
+        return [c.name,c.note,c.gate===null?'비연동':c.gate,c.k,open?'개방':'잠김'];}),
+      [],['익절 경보 (2개 이상 충족 시 20% 분할 익절)'],
+      ['MVRV ≥ 2.40'],['메이어 멀티플 ≥ 2.00'],['공포/탐욕 ≥ 85'],['국내 프리미엄 ≥ +5.0%']];
+    const xml=`<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',s3)}${sheet('자산군게이트',s4)}</Workbook>`;
+    dl(`매집계기반_${today}.xls`,'application/vnd.ms-excel',xml);
+    toast('엑셀 파일을 내려받았습니다.','var(--ok)','toast2');
+  };
+  $('btnCsv').onclick=()=>{
+    if(!records.length)return toast('저장된 기록이 없습니다.','var(--dim)','toast2');
+    const h=['기준일','BTC가격(k)','200주MA(k)','MVRV','메이어','공포탐욕','SOPR','김프%','A','B','C','D','총점','판정'];
+    const body=records.map(r=>[r.date,r.price,r.ma??'',r.mvrv??'',r.mayer??'',r.fg??'',r.sopr??'',r.prem??'',
+      r.A,r.B,r.C,r.D,r.total,r.tier].join(','));
+    dl(`매집기록_${new Date().toISOString().slice(0,10)}.csv`,'text/csv;charset=utf-8',
+      '\uFEFF'+[h.join(','),...body].join('\r\n'));
+    toast('CSV를 내려받았습니다.','var(--ok)','toast2');
+  };
+  $('btnJson').onclick=()=>{
+    dl(`매집계기반_백업_${new Date().toISOString().slice(0,10)}.json`,'application/json',
+      JSON.stringify({records,rows,nav:+$('i_nav').value,cash:+$('i_cash').value},null,2));
+    toast('백업 파일을 내려받았습니다.','var(--ok)','toast2');
+  };
+
+  $('btnLoad').onclick=()=>$('fileIn').click();
+  $('fileIn').onchange=e=>{
+    const f=e.target.files&&e.target.files[0]; if(!f)return;
+    const rd=new FileReader();
+    rd.onload=async()=>{
+      try{
+        const o=JSON.parse(rd.result);
+        if(!o||!Array.isArray(o.records))throw new Error('형식 불일치');
+        records=o.records;
+        if(Array.isArray(o.rows)&&o.rows.length)rows=o.rows;
+        if(typeof o.nav==='number')$('i_nav').value=o.nav;
+        if(typeof o.cash==='number')$('i_cash').value=o.cash;
+        await saveRec(); await savePort();
+        drawLog(); renderPortfolio();
+        toast(`복원 완료 · 기록 ${records.length}건`,'var(--ok)','toast2');
+      }catch(err){
+        toast('이 파일은 읽을 수 없습니다. 이 앱에서 내보낸 .json 백업인지 확인하세요.','var(--alarm)','toast2');
+      }
+      e.target.value='';
+    };
+    rd.onerror=()=>{toast('파일을 여는 데 실패했습니다. 다시 시도하세요.','var(--alarm)','toast2'); e.target.value='';};
+    rd.readAsText(f);
+  };
+
+  /* ---------- tabs ---------- */
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===b.dataset.tab));});
+
+  document.querySelectorAll('#p1 input, #p1 select').forEach(el=>{
+    el.addEventListener('input',render); el.addEventListener('change',render);});
+  $('i_date').value=new Date().toISOString().slice(0,10);
+  render(); loadAll();
+})();
+</script>
+</body>
+</html>
