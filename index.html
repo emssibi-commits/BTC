@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>매집 계기반</title>
 <style>
   :root{
@@ -172,7 +175,7 @@
   <div class="mast">
     <div>
       <h1>매집 계기반</h1>
-      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver">BUILD 2026-08-30 R41</span></div>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-08-30 R43</span></div>
     </div>
     <div class="total">
       <div class="n" id="totalN">—</div>
@@ -1358,6 +1361,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     await out('bak',`매집계기반_백업_${new Date().toISOString().slice(0,10)}.json`,'application/json',
       JSON.stringify({records,rows,daily,ladder:{total:+$('l_total').value,dca:+$('l_dca').value,res:+$('l_res').value,lad},
       links:{fx:+$('i_fx').value,up:+$('i_upbit').value,bi:+$('i_bithumb').value,bn:+$('i_binance').value},
+      flows,
       draft:(()=>{const o={};Object.keys(RAWMAP).forEach(k=>o[k]=$(RAWMAP[k]).value);
         o._base=$('i_base').value; o._fetched=lastFetch||''; return o;})(),nav:+$('i_nav').value,cash:+$('i_cash').value},null,2));
   };
@@ -1385,6 +1389,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
           if(D._fetched) lastFetch=D._fetched;
           await sSet(DKEY,JSON.stringify(D));
         }
+        if(o.flows&&typeof o.flows==='object'){ flows=o.flows; await sSet(FLOWKEY,JSON.stringify(flows)); renderFlows(); }
         if(o.links){const L=o.links;
           if(L.fx!=null)$('i_fx').value=L.fx; if(L.up!=null)$('i_upbit').value=L.up;
           if(L.bi!=null)$('i_bithumb').value=L.bi; if(L.bn!=null)$('i_binance').value=L.bn; renderLinks();}
@@ -2124,6 +2129,10 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       p1.appendChild(g);
     }
   })();
+  if($('ver')) $('ver').onclick=()=>{
+    const u=location.href.split('?')[0]+'?v='+Date.now();
+    location.replace(u);
+  };
   const fatal=window.__fatal;
   try{ render(); }catch(err){ fatal('render',err); }
   loadAll().then(()=>{
