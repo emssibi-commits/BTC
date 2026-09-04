@@ -175,7 +175,7 @@
   <div class="mast">
     <div>
       <h1>매집 계기반</h1>
-      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-08-30 R46</span></div>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-08-30 R49</span></div>
     </div>
     <div class="total">
       <div class="n" id="totalN">—</div>
@@ -417,15 +417,30 @@
         </div>
         <div class="card">
           <header><h2>코인 뉴스 헤드라인</h2>
-            <div class="btns"><button class="b" id="btnNews" style="padding:5px 10px;font-size:11.5px">불러오기</button></div>
+            <div class="btns" style="align-items:center">
+              <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim);margin-right:4px">
+                <input id="d_trans" type="checkbox" checked style="width:auto"> 한글 번역</label>
+              <button class="b" id="btnNews" style="padding:5px 10px;font-size:11.5px">불러오기</button>
+            </div>
           </header>
           <div class="row" style="grid-template-columns:1fr 132px;border:0;padding:0 0 8px">
             <div class="lab">오늘 뉴스 체감 <span class="man">수동</span> <em>기록에 함께 저장됩니다</em></div>
             <select id="d_senti"><option value="0">중립</option><option value="1">호재 우세</option><option value="-1">악재 우세</option></select>
           </div>
           <div id="newsList" class="note" style="margin:0">「불러오기」를 누르면 최신 헤드라인을 가져옵니다.</div>
+          <div class="btns" style="margin-top:9px">
+            <a class="b" href="https://cointelegraph.com/tags/bitcoin" target="_blank" rel="noopener"
+               style="text-decoration:none;display:inline-block;padding:7px 11px;font-size:11.5px">Cointelegraph</a>
+            <a class="b" href="https://www.coindesk.com/markets" target="_blank" rel="noopener"
+               style="text-decoration:none;display:inline-block;padding:7px 11px;font-size:11.5px">CoinDesk</a>
+            <a class="b" href="https://news.google.com/search?q=%EB%B9%84%ED%8A%B8%EC%BD%94%EC%9D%B8&hl=ko" target="_blank" rel="noopener"
+               style="text-decoration:none;display:inline-block;padding:7px 11px;font-size:11.5px">구글뉴스</a>
+            <a class="b" href="https://x.com/search?q=bitcoin&f=live" target="_blank" rel="noopener"
+               style="text-decoration:none;display:inline-block;padding:7px 11px;font-size:11.5px">X 실시간</a>
+          </div>
           <div class="note" style="margin-top:8px;color:var(--dim)">
-            X(트위터) 인플루언서 글은 무료 API가 없어 자동 수집이 불가능합니다. 헤드라인은 참고용이며 채점에 반영되지 않습니다.
+            불러오기가 막히면 위 바로가기로 직접 확인하십시오. X 인플루언서 글은 무료 API가 없어 자동 수집이 불가능합니다.
+            헤드라인은 참고용이며 채점에 반영되지 않습니다.
           </div>
         </div>
 
@@ -1750,34 +1765,118 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   $('btnPasteClear').onclick=()=>{ $('d_paste').value=''; $('pasteLog').textContent='각 행의 마지막 숫자를 총계로 읽습니다.'; };
 
   const FEEDS=[
+    ['Cointelegraph','https://cointelegraph.com/rss'],
     ['CoinDesk','https://www.coindesk.com/arc/outboundfeeds/rss/'],
-    ['Cointelegraph','https://cointelegraph.com/rss']
+    ['구글뉴스','https://news.google.com/rss/search?q=%EB%B9%84%ED%8A%B8%EC%BD%94%EC%9D%B8&hl=ko&gl=KR&ceid=KR:ko'],
+    ['Decrypt','https://decrypt.co/feed']
   ];
+  function parseFeed(txt,src){
+    let doc;
+    try{ doc=new DOMParser().parseFromString(txt,'text/xml'); }catch(e){ return []; }
+    if(!doc || doc.querySelector('parsererror')) return [];
+    let nodes=[...doc.querySelectorAll('item')];
+    if(!nodes.length) nodes=[...doc.querySelectorAll('entry')];   // Atom
+    const out=[];
+    nodes.slice(0,8).forEach(it=>{
+      const q=n=>{const e=it.querySelector(n); return e?(e.textContent||'').trim():'';};
+      const t=q('title');
+      let l=q('link');
+      if(!l){ const a2=it.querySelector('link'); if(a2) l=a2.getAttribute('href')||''; }
+      const p=q('pubDate')||q('published')||q('updated');
+      if(t) out.push({src,t,l,d:p?new Date(p):null});
+    });
+    return out;
+  }
+  async function fetchFeed(url,src){
+    const cands=[
+      url,
+      'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),
+      'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
+      'https://corsproxy.io/?url='+encodeURIComponent(url),
+      'https://api.allorigins.win/get?url='+encodeURIComponent(url)
+    ];
+    for(let i=0;i<cands.length;i++){
+      try{
+        const r=await fetch(cands[i],{cache:'no-store'});
+        if(!r.ok) continue;
+        let txt=await r.text();
+        if(cands[i].includes('rss2json')){
+          try{ const j=JSON.parse(txt);
+            if(j&&Array.isArray(j.items)&&j.items.length)
+              return {items:j.items.slice(0,8).map(x=>({src,t:(x.title||'').trim(),
+                l:x.link||'', d:x.pubDate?new Date(x.pubDate.replace(' ','T')+'Z'):null})), via:'rss2json'};
+          }catch(e){}
+          continue;
+        }
+        if(cands[i].includes('/get?url=')){
+          try{ const j=JSON.parse(txt); txt=j.contents||''; }catch(e){ continue; }
+        }
+        if(!txt||txt.length<40) continue;
+        const items=parseFeed(txt,src);
+        if(items.length) return {items,via:i===0?'직접':'중계'+i};
+      }catch(e){}
+    }
+    return {items:[],via:null};
+  }
+  async function toKo(text){
+    if(!text || /[가-힣]/.test(text)) return null;
+    try{
+      const r=await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ko&dt=t&q='
+        +encodeURIComponent(text),{cache:'no-store'});
+      if(r.ok){ const j=await r.json();
+        if(Array.isArray(j)&&Array.isArray(j[0])){
+          const out=j[0].map(x=>x&&x[0]?x[0]:'').join('').trim();
+          if(out) return out;
+        }
+      }
+    }catch(e){}
+    try{
+      const r2=await fetch('https://api.mymemory.translated.net/get?langpair=en|ko&q='+encodeURIComponent(text),{cache:'no-store'});
+      if(r2.ok){ const j2=await r2.json();
+        const t=j2&&j2.responseData&&j2.responseData.translatedText;
+        if(t && !/MYMEMORY WARNING/i.test(t)) return t.trim();
+      }
+    }catch(e){}
+    return null;
+  }
   $('btnNews').onclick=async()=>{
     const b=$('btnNews'); b.disabled=true; b.textContent='불러오는 중…';
-    const items=[];
+    $('newsList').innerHTML='<span style="color:var(--dim)">불러오는 중…</span>';
+    const all=[], stat=[];
     for(const [src,url] of FEEDS){
-      try{
-        const xml=await textVia(url);
-        const doc=new DOMParser().parseFromString(xml,'text/xml');
-        [...doc.querySelectorAll('item')].slice(0,6).forEach(it=>{
-          const t=(it.querySelector('title')||{}).textContent||'';
-          const l=(it.querySelector('link')||{}).textContent||'';
-          const p=(it.querySelector('pubDate')||{}).textContent||'';
-          if(t) items.push({src,t:t.trim(),l:l.trim(),d:p?new Date(p):null});
-        });
-      }catch(e){ items.push({src,t:'('+src+' 불러오기 실패 — 차단되었을 수 있습니다)',l:'',d:null}); }
+      const r=await fetchFeed(url,src);
+      if(r.items.length){ all.push(...r.items); stat.push(`<span style="color:var(--ok)">✓</span> ${src}(${r.items.length})`); }
+      else stat.push(`<span style="color:var(--alarm)">✗</span> ${src}`);
+      if(all.length>=16) break;
     }
-    items.sort((a,b2)=>(b2.d?b2.d.getTime():0)-(a.d?a.d.getTime():0));
-    $('newsList').innerHTML = items.length
-      ? items.slice(0,10).map(x=>{
-          const when=x.d?`${String(x.d.getMonth()+1).padStart(2,'0')}-${String(x.d.getDate()).padStart(2,'0')} ${String(x.d.getHours()).padStart(2,'0')}:${String(x.d.getMinutes()).padStart(2,'0')}`:'';
-          const title=x.l?`<a href="${x.l}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none">${x.t}</a>`:x.t;
-          return `<div style="padding:4px 0;border-top:1px solid rgba(42,55,66,.5);line-height:1.45">
-            <span style="color:var(--phos);font-family:var(--mono);font-size:10px">${x.src}</span>
-            <span style="color:var(--dim);font-family:var(--mono);font-size:10px"> ${when}</span><br>${title}</div>`;
-        }).join('')
-      : '가져온 헤드라인이 없습니다.';
+    all.sort((x,y)=>(y.d?y.d.getTime():0)-(x.d?x.d.getTime():0));
+    const seen=new Set();
+    const uniq=all.filter(x=>{const k=x.t.slice(0,40); if(seen.has(k))return false; seen.add(k); return true;}).slice(0,10);
+    if($('d_trans').checked){
+      $('newsList').innerHTML='<span style="color:var(--dim)">번역 중…</span>';
+      let okT=0;
+      for(const x of uniq){
+        x.ko=await toKo(x.t);
+        if(x.ko) okT++;
+        await sleep(120);
+      }
+      stat.push(okT?`<span style="color:var(--ok)">✓</span> 번역 ${okT}건`
+                   :`<span style="color:var(--alarm)">✗</span> 번역 실패`);
+    }
+    $('newsList').innerHTML =
+      `<div style="color:var(--dim);font-family:var(--mono);font-size:10px;margin-bottom:5px">${stat.join(' · ')}</div>`
+      + (uniq.length
+        ? uniq.map(x=>{
+            const w=x.d&&!isNaN(x.d)?`${String(x.d.getMonth()+1).padStart(2,'0')}-${String(x.d.getDate()).padStart(2,'0')} ${String(x.d.getHours()).padStart(2,'0')}:${String(x.d.getMinutes()).padStart(2,'0')}`:'';
+            const head=x.ko||x.t;
+            const ttl=x.l?`<a href="${x.l}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none">${head}</a>`:head;
+            const orig=x.ko?`<div style="color:var(--dim);font-size:10.5px;margin-top:1px">${x.t}</div>`:'';
+            return `<div style="padding:5px 0;border-top:1px solid rgba(42,55,66,.5);line-height:1.45">
+              <span style="color:var(--phos);font-family:var(--mono);font-size:10px">${x.src}</span>
+              <span style="color:var(--dim);font-family:var(--mono);font-size:10px"> ${w}</span><br>${ttl}${orig}</div>`;
+          }).join('')
+        : '<span style="color:var(--alarm)">모든 매체 실패</span> — 중계 서버가 차단된 것으로 보입니다. '
+          +'추세 분석의 <b>주식 조회</b>와 일일 점검의 <b>HY 스프레드</b>도 실패한다면 네트워크 차단이니, 아래 바로가기를 쓰십시오.');
     b.disabled=false; b.textContent='불러오기';
   };
   ['d_date','d_etf','d_fund','d_hy','d_flow','d_senti'].forEach(id=>$(id).addEventListener('input',renderDaily));
