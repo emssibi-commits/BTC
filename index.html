@@ -175,7 +175,7 @@
   <div class="mast">
     <div>
       <h1>매집 계기반</h1>
-      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-08-30 R43</span></div>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-08-30 R46</span></div>
     </div>
     <div class="total">
       <div class="n" id="totalN">—</div>
@@ -269,10 +269,10 @@
 
       <div class="card" id="cardD">
         <header><h2>D · 매크로</h2><div class="secscore"><b id="sD">0</b><span>/10</span></div></header>
-        <div class="row"><div class="lab">Global M2 총량 <span class="man">수동</span> <em>조 달러 · 4주 전 대비 +1%↑ → 5pt</em></div><input id="i_m2Raw" type="number" step="0.01" value="123.91">
+        <div class="row"><div class="lab">Global M2 총량 <span class="man">수동</span> <em>조 달러 · 4주 전 대비 +1%↑ → 3pt</em></div><input id="i_m2Raw" type="number" step="0.01" value="123.91">
           <div class="pts"><div class="bars" data-bars="m2"></div><div class="v" id="p_m2">0</div></div></div>
         <div class="derived" id="d_m2">—</div>
-        <div class="row"><div class="lab">DXY <em>≤96 → 3pt</em></div><input id="i_dxy" type="number" step="0.01" value="99.67">
+        <div class="row"><div class="lab">DXY <em>≤96.5 → 5 · ≤97.7 → 4 · ≤98.7 → 3 · ≤100 → 1 · 102 초과 → −2</em></div><input id="i_dxy" type="number" step="0.01" value="99.67">
           <div class="pts"><div class="bars" data-bars="dxy"></div><div class="v" id="p_dxy">0</div></div></div>
         <div class="row"><div class="lab">Fed 정책 <span class="man">수동</span> <em>인하 → 2pt</em></div>
           <select id="i_fed"><option value="2">인하</option><option value="1" selected>동결</option><option value="0">인상</option></select>
@@ -416,6 +416,20 @@
           <div id="dFlags"></div>
         </div>
         <div class="card">
+          <header><h2>코인 뉴스 헤드라인</h2>
+            <div class="btns"><button class="b" id="btnNews" style="padding:5px 10px;font-size:11.5px">불러오기</button></div>
+          </header>
+          <div class="row" style="grid-template-columns:1fr 132px;border:0;padding:0 0 8px">
+            <div class="lab">오늘 뉴스 체감 <span class="man">수동</span> <em>기록에 함께 저장됩니다</em></div>
+            <select id="d_senti"><option value="0">중립</option><option value="1">호재 우세</option><option value="-1">악재 우세</option></select>
+          </div>
+          <div id="newsList" class="note" style="margin:0">「불러오기」를 누르면 최신 헤드라인을 가져옵니다.</div>
+          <div class="note" style="margin-top:8px;color:var(--dim)">
+            X(트위터) 인플루언서 글은 무료 API가 없어 자동 수집이 불가능합니다. 헤드라인은 참고용이며 채점에 반영되지 않습니다.
+          </div>
+        </div>
+
+        <div class="card">
           <header><h2>판정 기준</h2></header>
           <div class="note" style="margin:0">
             <b style="color:var(--phos)">ETF 순유입</b> — 유입 지속이 정상. 3일 연속 유출은 주의, 5일 이상은 경고입니다.<br><br>
@@ -458,6 +472,24 @@
       <div id="trGate"></div>
     </div>
     <div class="card">
+      <header><h2>매크로 판정 · 달러인덱스 · USDT 도미넌스</h2>
+        <div class="secscore"><span id="macroTag" style="font-size:12px">—</span></div></header>
+      <div class="row" style="grid-template-columns:1fr 120px;border:0;padding:0 0 6px">
+        <div class="lab">달러 인덱스 (DXY) <em>비트코인 채점 D 매크로에서 자동 연동</em></div>
+        <div class="robox" id="m_dxy">—</div></div>
+      <div class="derived" id="m_dxyV" style="text-align:left;padding:0 0 8px">—</div>
+      <div class="row" style="grid-template-columns:1fr 120px;padding:8px 0 6px">
+        <div class="lab">USDT 도미넌스 % <span class="man">수동</span> <em>TradingView USDT.D · 주 1회 갱신</em></div>
+        <input id="m_usdtd" type="number" step="0.01" value="6.84"></div>
+      <div class="derived" id="m_usdtdV" style="text-align:left">—</div>
+      <div class="note">
+        <b style="color:var(--phos)">DXY</b> 98.7↓ 매집 · 97.7↓ 강력매집 · 96.5↓ 추가매집<br>
+        <b style="color:var(--phos)">USDT.D</b> 7.35↑ 강력매수 · 6.84↑ 매집 · 6.1↓ 추가매집 · 5.05↓ 매도 시작
+        <span style="color:var(--dim)">— 도미넌스가 높다 = 현금이 스테이블에 대기 중</span>
+      </div>
+    </div>
+
+    <div class="card">
       <header><h2>자산별 ETF 자금흐름 · 표 붙여넣기</h2>
         <div class="secscore"><span id="flowCount" style="color:var(--dim);font-size:11px">—</span></div></header>
       <div class="row" style="grid-template-columns:1fr 140px;border:0;padding:0 0 8px">
@@ -485,7 +517,8 @@
       <div class="xscroll" id="trTable"><div class="empty">위에서 종목을 하나 검색하거나, 전체 목록을 일괄 분석하십시오.</div></div>
       <div class="note">
         <b style="color:var(--phos)">일봉 정배열</b> WMA 5 &gt; 20 &gt; 60 · <b style="color:var(--phos)">일봉 크로스</b> WMA5가 WMA60을 상향/하향 돌파 ·
-        <b style="color:var(--phos)">주봉 크로스</b> WMA5주가 WMA20주를 상향/하향 돌파.<br>
+        <b style="color:var(--phos)">주봉 크로스</b> WMA5주가 WMA20주를 상향/하향 돌파 ·
+        <b style="color:var(--phos)">월봉 15WMA</b> 월봉 종가가 15개월 가중이동평균을 상향 돌파하면 최우선 강력 매수.<br>
         종합 판정은 일봉 배열과 주봉 방향을 함께 봅니다. 일봉 정배열이면서 주봉도 상승이면 강력 매수, 둘이 엇갈리면 관망입니다.
       </div>
     </div>
@@ -526,10 +559,12 @@
         <header><h2>실탄 사다리 · 200주 MA 매수 기준</h2>
           <div class="secscore"><span id="ladMa" style="color:var(--dim);font-size:11px">—</span></div>
         </header>
-        <div class="row" style="grid-template-columns:1fr 110px;border:0;padding:0 0 9px">
+        <div class="row" style="grid-template-columns:1fr 110px 84px;border:0;padding:0 0 9px;gap:8px">
           <div class="lab">총 투자금액 <em>만원 · 이 금액을 배율로 나눕니다</em></div>
           <input id="l_total" type="number" step="10" value="4500">
+          <button class="b primary" id="btnLadSave" style="padding:6px 10px;font-size:11.5px">저장</button>
         </div>
+        <div class="toast" id="toast7" style="margin:0 0 6px"></div>
         <div class="row" style="grid-template-columns:1fr 88px 1fr 88px;padding:9px 0 10px;gap:9px">
           <div class="lab">기본 DCA 배정 <em>%</em></div><input id="l_dca" type="number" step="1" value="20">
           <div class="lab">항복 예비 <em>%</em></div><input id="l_res" type="number" step="1" value="11">
@@ -625,14 +660,15 @@
     fg:v=>band(v,[[20,10],[30,8],[45,5],[60,2],[75,0]],-3),
     sopr:v=>band(v,[[0.98,8],[1.00,5],[1.02,3],[1.04,1]],0),
     prem:v=>band(v,[[0,7],[0.5,5],[2,3],[5,1]],-3),
-    m2:v=>v>=1?5:(v>=0?3:0), dxy:v=>band(v,[[96,3],[100,2]],0),
+    m2:v=>v>=1?3:(v>=0?2:0),
+    dxy:v=>band(v,[[96.5,5],[97.7,4],[98.7,3],[100,1],[102,0]],-2),
     etf12:v=>v>30000?9:(v>10000?7:(v>=-10000?4:(v>=-35000?2:0))),
     etf4:v=>v>20000?6:(v>6000?5:(v>=-6000?3:(v>=-20000?1:0))),
     stable:v=>v>=1?5:(v>-1?3:0), exch:v=>v<=-1?5:(v<1?3:0), fed:v=>[0,1,2][v],
     oi:v=>v<=-10?2:(v<0?1:(v<=8?0:(v<=15?-2:-4))),
     taker:v=>v>=53?3:(v>=51?2:(v>=49?0:(v>=47?-1:-2)))
   };
-  const MAX={ratio:15,mvrv:15,mayer:10,fg:10,sopr:8,prem:7,etf12:9,etf4:6,stable:5,exch:5,m2:5,dxy:3,fed:2,oi:2,taker:3};
+  const MAX={ratio:15,mvrv:15,mayer:10,fg:10,sopr:8,prem:7,etf12:9,etf4:6,stable:5,exch:5,m2:3,dxy:5,fed:2,oi:2,taker:3};
   const TIERS=[
     {min:75,name:'항복존',act:'예비 탄약 일괄 투입',mult:'ALL',color:'--buy'},
     {min:66,name:'적극 매집',act:'주간 기본액 × 3',mult:3,color:'--buy'},
@@ -853,7 +889,7 @@
     $('exitMsg').style.color=n>=2?'var(--alarm)':'var(--dim)';
 
     renderManual(d);
-    renderGates(); saveDraft(); if($('ladBody')) renderLadder();
+    renderGates(); saveDraft(); if($('ladBody')) renderLadder(); if($('m_dxy')) renderMacro();
   }
 
   /* ---------- asset classes ---------- */
@@ -1128,6 +1164,7 @@
     const c=await sGet(DAYKEY); daily=c?JSON.parse(c):[];
     const ck=await sGet('btcscore:cgkey'); if(ck) $('d_cgkey').value=ck;
     const df=await sGet('btcscore:dfetch'); if(df) lastDFetch=df;
+    const ud=await sGet('btcscore:usdtd'); if(ud&&$('m_usdtd')) $('m_usdtd').value=ud;
     const fl=await sGet(FLOWKEY); if(fl){try{flows=JSON.parse(fl)||{};}catch(x){flows={};}}
     const lk=await sGet('btcscore:links');
     if(lk){try{const o=JSON.parse(lk);
@@ -1361,6 +1398,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     await out('bak',`매집계기반_백업_${new Date().toISOString().slice(0,10)}.json`,'application/json',
       JSON.stringify({records,rows,daily,ladder:{total:+$('l_total').value,dca:+$('l_dca').value,res:+$('l_res').value,lad},
       links:{fx:+$('i_fx').value,up:+$('i_upbit').value,bi:+$('i_bithumb').value,bn:+$('i_binance').value},
+      usdtd:+$('m_usdtd').value,
       flows,
       draft:(()=>{const o={};Object.keys(RAWMAP).forEach(k=>o[k]=$(RAWMAP[k]).value);
         o._base=$('i_base').value; o._fetched=lastFetch||''; return o;})(),nav:+$('i_nav').value,cash:+$('i_cash').value},null,2));
@@ -1389,6 +1427,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
           if(D._fetched) lastFetch=D._fetched;
           await sSet(DKEY,JSON.stringify(D));
         }
+        if(o.usdtd!=null&&$('m_usdtd')){ $('m_usdtd').value=o.usdtd; renderMacro(); }
         if(o.flows&&typeof o.flows==='object'){ flows=o.flows; await sSet(FLOWKEY,JSON.stringify(flows)); renderFlows(); }
         if(o.links){const L=o.links;
           if(L.fx!=null)$('i_fx').value=L.fx; if(L.up!=null)$('i_upbit').value=L.up;
@@ -1558,13 +1597,14 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     const recent=daily.slice().sort((a,b)=>a.date<b.date?1:-1).slice(0,14);
     $('dCount').textContent=daily.length+'건';
     $('dTable').innerHTML = recent.length
-      ? `<table><thead><tr><th>날짜</th><th>ETF(BTC)</th><th>ETF(USD)</th><th>펀딩비%</th><th>HY%</th><th>순입출금</th></tr></thead><tbody>${
+      ? `<table><thead><tr><th>날짜</th><th>ETF(BTC)</th><th>ETF(USD)</th><th>펀딩비%</th><th>HY%</th><th>순입출금</th><th>뉴스</th></tr></thead><tbody>${
           recent.map(r=>`<tr><td>${r.date}</td>
             <td style="color:${r.etf>0?'var(--buy)':(r.etf<0?'var(--sell)':'var(--dim)')}">${(r.etf>0?'+':'')+(r.etf||0).toLocaleString('ko-KR')}</td>
             <td style="color:${(r.etfUsd||0)>0?'var(--buy)':((r.etfUsd||0)<0?'var(--sell)':'var(--dim)')}">${r.etfUsd==null?'—':((r.etfUsd>0?'+':'')+cmpUSD(r.etfUsd))}</td>
             <td>${r.funding==null||isNaN(r.funding)?'—':r.funding.toFixed(4)}</td>
             <td style="color:${r.hy>=3.5?'var(--warn)':'var(--text)'}">${r.hy==null||isNaN(r.hy)?'—':r.hy.toFixed(2)}</td>
-            <td style="color:${(r.flow||0)<0?'var(--ok)':((r.flow||0)>0?'var(--alarm)':'var(--dim)')}">${r.flow==null?'—':((r.flow>0?'+':'')+r.flow.toLocaleString('ko-KR'))}</td></tr>`).join('')}</tbody></table>`
+            <td style="color:${(r.flow||0)<0?'var(--buy)':((r.flow||0)>0?'var(--sell)':'var(--dim)')}">${r.flow==null?'—':((r.flow>0?'+':'')+r.flow.toLocaleString('ko-KR'))}</td>
+            <td style="color:${(r.senti||0)>0?'var(--buy)':((r.senti||0)<0?'var(--sell)':'var(--dim)')}">${r.senti>0?'호재':(r.senti<0?'악재':'—')}</td></tr>`).join('')}</tbody></table>`
       : '<div class="empty">저장된 일일 기록이 없습니다.</div>';
     sSet(DAYKEY,JSON.stringify(daily));
   }
@@ -1572,7 +1612,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   $('btnDSave').onclick=async()=>{
     const date=$('d_date').value||new Date().toISOString().slice(0,10);
     daily=daily.filter(x=>x.date!==date);
-    daily.push({date,etf:+$('d_etf').value||0,funding:+$('d_fund').value,hy:+$('d_hy').value,flow:+$('d_flow').value||0});
+    daily.push({date,etf:+$('d_etf').value||0,funding:+$('d_fund').value,hy:+$('d_hy').value,flow:+$('d_flow').value||0,senti:+$('d_senti').value||0});
     daily.sort((a,b)=>a.date<b.date?-1:1);
     await sSet(DAYKEY,JSON.stringify(daily));
     renderDaily(); fillEtfFromDaily(true); render();
@@ -1709,7 +1749,38 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   };
   $('btnPasteClear').onclick=()=>{ $('d_paste').value=''; $('pasteLog').textContent='각 행의 마지막 숫자를 총계로 읽습니다.'; };
 
-  ['d_date','d_etf','d_fund','d_hy','d_flow'].forEach(id=>$(id).addEventListener('input',renderDaily));
+  const FEEDS=[
+    ['CoinDesk','https://www.coindesk.com/arc/outboundfeeds/rss/'],
+    ['Cointelegraph','https://cointelegraph.com/rss']
+  ];
+  $('btnNews').onclick=async()=>{
+    const b=$('btnNews'); b.disabled=true; b.textContent='불러오는 중…';
+    const items=[];
+    for(const [src,url] of FEEDS){
+      try{
+        const xml=await textVia(url);
+        const doc=new DOMParser().parseFromString(xml,'text/xml');
+        [...doc.querySelectorAll('item')].slice(0,6).forEach(it=>{
+          const t=(it.querySelector('title')||{}).textContent||'';
+          const l=(it.querySelector('link')||{}).textContent||'';
+          const p=(it.querySelector('pubDate')||{}).textContent||'';
+          if(t) items.push({src,t:t.trim(),l:l.trim(),d:p?new Date(p):null});
+        });
+      }catch(e){ items.push({src,t:'('+src+' 불러오기 실패 — 차단되었을 수 있습니다)',l:'',d:null}); }
+    }
+    items.sort((a,b2)=>(b2.d?b2.d.getTime():0)-(a.d?a.d.getTime():0));
+    $('newsList').innerHTML = items.length
+      ? items.slice(0,10).map(x=>{
+          const when=x.d?`${String(x.d.getMonth()+1).padStart(2,'0')}-${String(x.d.getDate()).padStart(2,'0')} ${String(x.d.getHours()).padStart(2,'0')}:${String(x.d.getMinutes()).padStart(2,'0')}`:'';
+          const title=x.l?`<a href="${x.l}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none">${x.t}</a>`:x.t;
+          return `<div style="padding:4px 0;border-top:1px solid rgba(42,55,66,.5);line-height:1.45">
+            <span style="color:var(--phos);font-family:var(--mono);font-size:10px">${x.src}</span>
+            <span style="color:var(--dim);font-family:var(--mono);font-size:10px"> ${when}</span><br>${title}</div>`;
+        }).join('')
+      : '가져온 헤드라인이 없습니다.';
+    b.disabled=false; b.textContent='불러오기';
+  };
+  ['d_date','d_etf','d_fund','d_hy','d_flow','d_senti'].forEach(id=>$(id).addEventListener('input',renderDaily));
 
   /* ---------- 현재가 자동 갱신 ---------- */
   function tickerOf(r){
@@ -1834,6 +1905,11 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   $('ladBody').addEventListener('change',e=>{ if(e.target.dataset.lf==='done'){
     const tr=e.target.closest('tr'); lad[+tr.dataset.l].done=e.target.checked; renderLadder(); }});
   ['l_total','l_dca','l_res'].forEach(id=>$(id).addEventListener('input',renderLadder));
+  $('btnLadSave').onclick=async()=>{
+    renderLadder();
+    await sSet(LADKEY,JSON.stringify({total:+$('l_total').value,dca:+$('l_dca').value,res:+$('l_res').value,lad}));
+    toast(`총 투자금액 ${(+$('l_total').value).toLocaleString('ko-KR')}만원 저장`,'var(--ok)','toast7');
+  };
 
   /* ---------- WMA trend ---------- */
   function wmaAt(a,n,off){
@@ -1853,28 +1929,45 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     });
     return out;
   }
-  function judge(d,w){
+  function toMonthly(bars){
+    const out=[]; let key=null;
+    bars.forEach(b=>{ const d=new Date(b.t);
+      const k=d.getUTCFullYear()+'-'+d.getUTCMonth();
+      if(k===key) out[out.length-1]=b.c; else { out.push(b.c); key=k; }});
+    return out;
+  }
+  function judge(d,w,m){
     const d5=wmaAt(d,5,0), d5p=wmaAt(d,5,1), d20=wmaAt(d,20,0),
           d60=wmaAt(d,60,0), d60p=wmaAt(d,60,1);
     const w5=wmaAt(w,5,0), w5p=wmaAt(w,5,1), w20=wmaAt(w,20,0), w20p=wmaAt(w,20,1);
     if([d5,d5p,d20,d60,d60p,w5,w5p,w20,w20p].some(v=>v===null)) return null;
+    m=m||[];
+    const m15=wmaAt(m,15,0), m15p=wmaAt(m,15,1);
+    const mC=m.length?m[m.length-1]:null, mCp=m.length>1?m[m.length-2]:null;
+    const hasM=(m15!==null&&m15p!==null&&mC!==null&&mCp!==null);
+    const mGold=hasM&&mCp<=m15p&&mC>m15, mDead=hasM&&mCp>=m15p&&mC<m15;
+    const mUp=hasM&&mC>m15;
     const jung = d5>d20 && d20>d60, yeok = d5<d20 && d20<d60;
     const dGold = d5p<=d60p && d5>d60, dDead = d5p>=d60p && d5<d60;
     const wGold = w5p<=w20p && w5>w20, wDead = w5p>=w20p && w5<w20;
     const wUp = w5>w20;
     let v,s;
-    if(jung && wUp){ v='강력 매수'; s='ok'; }
+    if(mGold){ v='강력 매수'; s='ok'; }
+    else if(jung && wUp){ v='강력 매수'; s='ok'; }
     else if(dGold || wGold){ v='매수'; s='ok'; }
+    else if(mDead){ v='매도'; s='alarm'; }
     else if(yeok && !wUp){ v='매도'; s='alarm'; }
     else if(dDead || wDead){ v='매도 검토'; s='warn'; }
     else { v='관망'; s='dim'; }
-    return {d5,d20,d60,w5,w20,jung,yeok,dGold,dDead,wGold,wDead,wUp,verdict:v,state:s,
+    return {d5,d20,d60,w5,w20,jung,yeok,dGold,dDead,wGold,wDead,wUp,
+      hasM,mGold,mDead,mUp,verdict:v,state:s,
+      mx: !hasM?'데이터 부족':(mGold?'상승 돌파':(mDead?'하향 이탈':(mUp?'15WMA 상회':'15WMA 하회'))),
       arr: jung?'정배열':(yeok?'역배열':'혼조'),
       dx: dGold?'골든크로스':(dDead?'데드크로스':(d5>d60?'5>60 유지':'5<60 유지')),
       wx: wGold?'골든크로스':(wDead?'데드크로스':(wUp?'5>20 유지':'5<20 유지'))};
   }
   async function barsBinance(sym){
-    const r=await jget(`https://api.binance.com/api/v3/klines?symbol=${sym}USDT&interval=1d&limit=400`);
+    const r=await jget(`https://api.binance.com/api/v3/klines?symbol=${sym}USDT&interval=1d&limit=1000`);
     return r.map(k=>({t:k[0],c:+k[4]}));
   }
   async function textVia(url){
@@ -1899,7 +1992,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     throw last||new Error('fetch fail');
   }
   async function barsYahoo(sym){
-    const j=await jgetVia(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=2y&interval=1d`);
+    const j=await jgetVia(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=5y&interval=1d`);
     const r=j&&j.chart&&j.chart.result&&j.chart.result[0];
     if(!r||!r.timestamp) throw new Error('no data');
     const cl=r.indicators.quote[0].close, out=[];
@@ -1908,7 +2001,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     return out;
   }
   async function barsTwelve(sym,key){
-    const j=await jget(`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(sym)}&interval=1day&outputsize=400&apikey=${encodeURIComponent(key)}`);
+    const j=await jget(`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(sym)}&interval=1day&outputsize=1200&apikey=${encodeURIComponent(key)}`);
     if(!j.values) throw new Error(j.message||'no data');
     return j.values.map(v=>({t:new Date(v.datetime+'T00:00:00Z').getTime(),c:+v.close})).reverse();
   }
@@ -1924,14 +2017,16 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     $('trTable').innerHTML=`<table class="ptab"><thead><tr>
       <th style="min-width:64px">종목</th><th style="min-width:104px">구분</th><th style="min-width:80px">현재가</th>
       <th style="min-width:64px">일봉 배열</th><th style="min-width:86px">일봉 5–60</th>
-      <th style="min-width:86px">주봉 5–20</th><th style="min-width:76px">종합</th><th style="min-width:34px"></th></tr></thead><tbody>${
+      <th style="min-width:86px">주봉 5–20</th><th style="min-width:92px">월봉 15WMA</th>
+      <th style="min-width:76px">종합</th><th style="min-width:34px"></th></tr></thead><tbody>${
       trResults.map((r,i)=> r.err
-        ? `<tr><td style="text-align:left">${r.sym}</td><td>${r.kind}</td><td colspan="4" style="color:var(--dim)">${r.err}</td><td style="color:var(--dim)">—</td><td><button class="mini" data-tdel="${i}">×</button></td></tr>`
+        ? `<tr><td style="text-align:left">${r.sym}</td><td>${r.kind}</td><td colspan="5" style="color:var(--dim)">${r.err}</td><td style="color:var(--dim)">—</td><td><button class="mini" data-tdel="${i}">×</button></td></tr>`
         : `<tr><td style="text-align:left">${r.sym}</td><td style="color:var(--dim)">${r.kind}</td>
             <td>${r.px>=100?r.px.toLocaleString('en-US',{maximumFractionDigits:2}):r.px.toPrecision(4)}</td>
             <td style="color:${r.jung?'var(--ok)':(r.yeok?'var(--alarm)':'var(--dim)')}">${r.arr}</td>
             <td style="color:${r.dGold?'var(--ok)':(r.dDead?'var(--alarm)':'var(--dim)')}">${r.dx}</td>
-            <td style="color:${r.wGold?'var(--ok)':(r.wDead?'var(--alarm)':'var(--dim)')}">${r.wx}</td>
+            <td style="color:${r.wGold?'var(--buy)':(r.wDead?'var(--sell)':'var(--dim)')}">${r.wx}</td>
+            <td style="color:${r.mGold?'var(--buy)':(r.mDead?'var(--sell)':(r.mUp?'var(--buy2)':'var(--dim)'))};font-weight:${r.mGold?700:400}">${r.mx}</td>
             <td style="color:${col[r.state]};font-weight:700">${r.verdict}</td>
             <td><button class="mini" data-tdel="${i}">×</button></td></tr>`).join('')}</tbody></table>`;
     $('trCount').textContent=`${trResults.filter(r=>!r.err).length} / ${trResults.length}종목 판정`;
@@ -1955,7 +2050,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       else { try{ await asCoin(); }catch(e){ await asStock(); } }
     }catch(e){ return {sym,kind:'—',err:'조회 실패 — 티커를 확인하십시오'}; }
     const label = src==='Binance' ? '코인 · Binance' : '주식 · '+src;
-    const j=judge(d.map(x=>x.c),toWeekly(d));
+    const j=judge(d.map(x=>x.c),toWeekly(d),toMonthly(d));
     return j?{sym,kind:label,px:d[d.length-1].c,...j}:{sym,kind:label,err:'데이터 부족'};
   }
 
@@ -2017,6 +2112,40 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       :'일일 점검에 ETF 기록이 부족합니다. 값을 직접 입력하십시오.', done?'var(--ok)':'var(--warn)');
   }
   $('btnEtfFill').onclick=()=>fillEtfFromDaily(false);
+
+  /* ---------- 매크로 판정 ---------- */
+  function dxyVerdict(v){
+    if(!isFinite(v)) return ['—','dim'];
+    if(v<=96.5) return ['추가 매집','buy'];
+    if(v<=97.7) return ['강력 매집','buy'];
+    if(v<=98.7) return ['매집','buy2'];
+    return ['관망','dim'];
+  }
+  function usdtdVerdict(v){
+    if(!isFinite(v)) return ['—','dim'];
+    if(v>=7.35) return ['강력 매수','buy'];
+    if(v>=6.84) return ['매집','buy'];
+    if(v>6.10)  return ['관망','dim'];
+    if(v>5.05)  return ['추가 매집','buy2'];
+    return ['매도 시작','sell'];
+  }
+  function renderMacro(){
+    if(!$('m_dxy'))return;
+    const COL={buy:'var(--buy)',buy2:'var(--buy2)',sell:'var(--sell)',dim:'var(--dim)'};
+    const dx=+($('i_dxy')?$('i_dxy').value:NaN);
+    const ud=+$('m_usdtd').value;
+    const [dv,dc]=dxyVerdict(dx), [uv,uc]=usdtdVerdict(ud);
+    $('m_dxy').textContent=isFinite(dx)?dx.toFixed(2):'—';
+    $('m_dxyV').innerHTML=`DXY <b style="color:${COL[dc]}">${dv}</b>
+      <span style="color:var(--dim)">· 98.7 / 97.7 / 96.5 기준</span>`;
+    $('m_usdtdV').innerHTML=`USDT.D <b style="color:${COL[uc]}">${uv}</b>
+      <span style="color:var(--dim)">· 7.35 / 6.84 / 6.10 / 5.05 기준</span>`;
+    const both=(dc==='buy'&&uc==='buy');
+    $('macroTag').textContent = both?'동시 매집 신호':`${dv} · ${uv}`;
+    $('macroTag').style.color = both?'var(--buy)':'var(--dim)';
+    sSet('btcscore:usdtd',String(ud));
+  }
+  if($('m_usdtd')) $('m_usdtd').addEventListener('input',renderMacro);
 
   /* ---------- 자산별 ETF 자금흐름 ---------- */
   const FLOWKEY='btcscore:etfflows';
