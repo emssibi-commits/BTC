@@ -175,7 +175,7 @@
   <div class="mast">
     <div>
       <h1>매집 계기반</h1>
-      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-08-30 R49</span></div>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-09-05 R56</span></div>
     </div>
     <div class="total">
       <div class="n" id="totalN">—</div>
@@ -223,22 +223,22 @@
             <input id="i_maAuto" type="checkbox" checked style="width:auto"> 허용</label></div>
         <div class="derived">가격 ÷ 200주MA = <b id="d_ratio">—</b></div>
         <div class="row" style="border-top:1px solid rgba(42,55,66,.55); margin-top:6px">
-          <div class="lab">200주MA 배수 <em>≤1.00 매수 15pt · 1.05→12 · 1.10→9 · 1.25 초과 0</em></div>
+          <div class="lab">200주MA 배수 <em>≤1.00 매수 15 · 1.15→12 · 1.35→9 · 1.60→6 · 1.90→3 · 2.20 초과 0</em></div>
           <div class="robox" id="d_ratio2">—</div>
           <div class="pts"><div class="bars" data-bars="ratio"></div><div class="v" id="p_ratio">0</div></div></div>
-        <div class="row"><div class="lab">MVRV 비율 <span class="man">수동</span> <em>≤1.20 매수 15pt · 1.30→11 · 1.40→7 · 1.70 초과 0</em></div><input id="i_mvrv" type="number" step="0.01" value="1.47">
+        <div class="row"><div class="lab">MVRV 비율 <span class="man">수동</span> <em>저평가 ≤1.00 → 15 · 1.20→13 · 중간선 1.40→10 · 1.80→7 · 2.30→4 · 과열 3.50 초과 0</em></div><input id="i_mvrv" type="number" step="0.01" value="1.47">
           <div class="pts"><div class="bars" data-bars="mvrv"></div><div class="v" id="p_mvrv">0</div></div></div>
-        <div class="row"><div class="lab">메이어 멀티플 <em>≤0.75 → 10pt</em></div><input id="i_mayer" type="number" step="0.001" value="1.1">
+        <div class="row"><div class="lab">메이어 멀티플 <em>≤0.80 → 10 · Buy 1.00→8 · 1.20→6 · 1.50→4 · 1.90→2 · Sell 2.40 초과 0</em></div><input id="i_mayer" type="number" step="0.001" value="1.1">
           <div class="pts"><div class="bars" data-bars="mayer"></div><div class="v" id="p_mayer">0</div></div></div>
       </div>
 
       <div class="card" id="cardB">
         <header><h2>B · 시장 심리</h2><div class="secscore"><b id="sB">0</b><span>/25</span></div></header>
-        <div class="row"><div class="lab">공포/탐욕 지수 <em>&lt;20 매수 10pt · 30→8 · 45→5 · 76+ → −3pt</em></div><input id="i_fg" type="number" step="1" value="73">
+        <div class="row"><div class="lab">공포/탐욕 지수 <em>공포 ≤20 → 10 · 30→8 · 45→5 · 60→2 · 75→0 · 탐욕 85 초과 → −4</em></div><input id="i_fg" type="number" step="1" value="73">
           <div class="pts"><div class="bars" data-bars="fg"></div><div class="v" id="p_fg">0</div></div></div>
-        <div class="row"><div class="lab">SOPR <span class="man">수동</span> <em>≤0.98 매수 8pt · 1.00→5 · 1.02→3 · 1.04 초과 0</em></div><input id="i_sopr" type="number" step="0.001" value="1.0">
+        <div class="row"><div class="lab">SOPR <span class="man">수동</span> <em>항복 ≤0.95 → 8 · 매수 0.98→7 · 1.00→5 · 1.02→3 · 1.04 초과 0</em></div><input id="i_sopr" type="number" step="0.001" value="1.0">
           <div class="pts"><div class="bars" data-bars="sopr"></div><div class="v" id="p_sopr">0</div></div></div>
-        <div class="row"><div class="lab">국내 프리미엄 % <em>≤0 매수 7pt · 0.5→5 · 2→3 · +5 초과 → −3pt</em></div><input id="i_prem" type="number" step="0.01" value="0.325">
+        <div class="row"><div class="lab">국내 프리미엄 % <em>역프 ≤−2 → 7 · 0→6 · 1→4 · 3→2 · 6→0 · +10 초과 → −4</em></div><input id="i_prem" type="number" step="0.01" value="0.325">
           <div class="pts"><div class="bars" data-bars="prem"></div><div class="v" id="p_prem">0</div></div></div>
       </div>
 
@@ -319,9 +319,9 @@
         <header><h2>매집단계</h2></header>
         <div class="note" style="margin:0 0 9px">배정 비율과 금액은 <b style="color:var(--phos)">실탄 사다리</b> 입력과 연동됩니다.</div>
         <div class="ammo">
-          <div class="lock" id="lk1"><div class="dot"></div><div class="t">1층 · 기본 DCA <em>28점 이상</em></div><div class="s">OPEN</div></div>
-          <div class="lock" id="lk2"><div class="dot"></div><div class="t">2층 · 조건부 트랑쉐 <em>57점 이상</em></div><div class="s">—</div></div>
-          <div class="lock" id="lk3"><div class="dot"></div><div class="t">3층 · 항복 예비 <em>75점 · 200MA하회+공포20 · HY 4.0%</em></div><div class="s">—</div></div>
+          <div class="lock" id="lk1"><div class="dot"></div><div class="t">1층 · 기본 DCA <em>30점 이상</em></div><div class="s">OPEN</div></div>
+          <div class="lock" id="lk2"><div class="dot"></div><div class="t">2층 · 조건부 트랑쉐 <em>56점 이상</em></div><div class="s">—</div></div>
+          <div class="lock" id="lk3"><div class="dot"></div><div class="t">3층 · 항복 예비 <em>73점 · 200MA하회+공포20 · HY 4.0%</em></div><div class="s">—</div></div>
         </div>
         <div class="exit" id="exitBox">
           <div class="hd"><span>충족 항목</span><span id="exitCount">0 / 4</span></div>
@@ -393,7 +393,7 @@
           </div>
           <div class="note" id="pasteLog" style="margin-top:7px">가로·세로 어느 형태로 복사되어도 인식합니다. 날짜 뒤(또는 아래) <b>마지막 숫자</b>를 총계로 읽고, K·M·B 단위를 변환합니다.</div>
           <div class="row" style="grid-template-columns:1fr;padding:11px 0 0">
-            <div class="lab">CoinGlass API 키 <em>선택 · 브라우저 차단(CORS)으로 실패할 수 있습니다</em></div>
+            <div class="lab">CoinGlass API 키 <em>v4 · 계정에 플랜이 활성화돼 있어야 합니다 (Pricing → Hobbyist)</em></div>
             <input id="d_cgkey" style="text-align:left" placeholder="실패하면 위 붙여넣기를 쓰십시오">
           </div>
           <div class="btns" style="margin-top:12px">
@@ -479,7 +479,7 @@
         <button class="b ghost" id="btnClearTr">결과 비우기</button>
       </div>
       <div class="row" style="grid-template-columns:1fr">
-        <div class="lab">Twelve Data API 키 <em>선택 · Yahoo 조회 실패 시에만 사용</em></div>
+        <div class="lab">Twelve Data API 키 <em>주식이 안 되면 필수 · twelvedata.com 무료 가입 후 발급</em></div>
         <input id="tr_key" style="text-align:left" placeholder="비워두셔도 됩니다 — Yahoo가 우선입니다">
       </div>
 
@@ -669,12 +669,12 @@
   /* ---------- scoring ---------- */
   const band=(v,p,l)=>{for(const[t,s]of p)if(v<=t)return s;return l};
   const S={
-    ratio:v=>band(v,[[1.00,15],[1.05,12],[1.10,9],[1.15,6],[1.25,3]],0),
-    mvrv:v=>band(v,[[1.20,15],[1.30,11],[1.40,7],[1.55,4],[1.70,2]],0),
-    mayer:v=>band(v,[[0.75,10],[0.85,8],[1.00,5],[1.15,3],[1.40,1]],0),
-    fg:v=>band(v,[[20,10],[30,8],[45,5],[60,2],[75,0]],-3),
-    sopr:v=>band(v,[[0.98,8],[1.00,5],[1.02,3],[1.04,1]],0),
-    prem:v=>band(v,[[0,7],[0.5,5],[2,3],[5,1]],-3),
+    ratio:v=>band(v,[[1.00,15],[1.15,12],[1.35,9],[1.60,6],[1.90,3],[2.20,1]],0),
+    mvrv:v=>band(v,[[1.00,15],[1.20,13],[1.40,10],[1.80,7],[2.30,4],[3.00,2],[3.50,1]],0),
+    mayer:v=>band(v,[[0.80,10],[1.00,8],[1.20,6],[1.50,4],[1.90,2],[2.40,1]],0),
+    fg:v=>band(v,[[20,10],[30,8],[45,5],[60,2],[75,0],[85,-2]],-4),
+    sopr:v=>band(v,[[0.95,8],[0.98,7],[1.00,5],[1.02,3],[1.04,1]],0),
+    prem:v=>band(v,[[-2,7],[0,6],[1,4],[3,2],[6,0],[10,-2]],-4),
     m2:v=>v>=1?3:(v>=0?2:0),
     dxy:v=>band(v,[[96.5,5],[97.7,4],[98.7,3],[100,1],[102,0]],-2),
     etf12:v=>v>30000?9:(v>10000?7:(v>=-10000?4:(v>=-35000?2:0))),
@@ -685,11 +685,11 @@
   };
   const MAX={ratio:15,mvrv:15,mayer:10,fg:10,sopr:8,prem:7,etf12:9,etf4:6,stable:5,exch:5,m2:3,dxy:5,fed:2,oi:2,taker:3};
   const TIERS=[
-    {min:75,name:'항복존',act:'예비 탄약 일괄 투입',mult:'ALL',color:'--buy'},
-    {min:66,name:'적극 매집',act:'주간 기본액 × 3',mult:3,color:'--buy'},
-    {min:57,name:'확대 매집',act:'주간 기본액 × 2',mult:2,color:'--buy2'},
-    {min:47,name:'중립',act:'주간 기본액 × 1',mult:1,color:'--caution'},
-    {min:28,name:'감속',act:'주간 기본액 × 0.5',mult:0.5,color:'--standby'},
+    {min:73,name:'항복존',act:'예비 탄약 일괄 투입',mult:'ALL',color:'--buy'},
+    {min:64,name:'적극 매집',act:'주간 기본액 × 3',mult:3,color:'--buy'},
+    {min:56,name:'확대 매집',act:'주간 기본액 × 2',mult:2,color:'--buy2'},
+    {min:46,name:'중립',act:'주간 기본액 × 1',mult:1,color:'--caution'},
+    {min:30,name:'감속',act:'주간 기본액 × 0.5',mult:0.5,color:'--standby'},
     {min:-99,name:'중단',act:'신규 매수 정지 · 익절 검토',mult:0,color:'--sell'}];
   const tierOf=s=>TIERS.find(t=>s>=t.min);
   const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -698,7 +698,7 @@
   (function drawTicks(){
     const g=$('ticks'), gl=$('ticklabels'); if(!g||!gl) return;
     const CX=150, CY=162, R=98;
-    [[0,'중단'],[28,'0.5×'],[47,'1×'],[57,'2×'],[66,'3×'],[75,'일괄'],[100,'']].forEach(([sc,lab])=>{
+    [[0,'중단'],[30,'0.5×'],[46,'1×'],[56,'2×'],[64,'3×'],[73,'일괄'],[100,'']].forEach(([sc,lab])=>{
       const a=(-90+sc*1.8)*Math.PI/180;
       const l=document.createElementNS('http://www.w3.org/2000/svg','line');
       l.setAttribute('x1',(CX+Math.sin(a)*(R-7)).toFixed(1));
@@ -860,9 +860,9 @@
       e.style.color=r.p[k]>0?'var(--buy)':(r.p[k]<0?'var(--sell)':'var(--dim)');});
 
     const t=tierOf(r.total), col=cssv(t.color);
-    const LG=[['75점 이상','일괄','예비 탄약 투입'],['66~74점','×3','기본액 3배'],
-      ['57~65점','×2','기본액 2배'],['47~56점','×1','기본액'],
-      ['28~46점','×0.5','절반'],['27점 이하','0','중단']];
+    const LG=[['73점 이상','일괄','예비 탄약 투입'],['64~72점','×3','기본액 3배'],
+      ['56~63점','×2','기본액 2배'],['46~55점','×1','기본액'],
+      ['30~45점','×0.5','절반'],['29점 이하','0','중단']];
     const lg=$('dialLegend');
     if(lg) lg.innerHTML='<div class="lt">SCORE → MULTIPLIER</div><table>'+
       LG.map(([a,b,c],i)=>{
@@ -888,8 +888,8 @@
     $('amtN').textContent=t.mult==='ALL'?'일괄':(base*t.mult).toLocaleString('ko-KR');
     $('amtN').style.color=col;
 
-    const l3=r.total>=75||(r.ratio<=1.0&&d.fg<20)||(hyNow!==null&&hyNow>=4.0);
-    [['lk1',r.total>=28],['lk2',r.total>=57],['lk3',l3]].forEach(([id,on])=>{
+    const l3=r.total>=73||(r.ratio<=1.0&&d.fg<20)||(hyNow!==null&&hyNow>=4.0);
+    [['lk1',r.total>=30],['lk2',r.total>=56],['lk3',l3]].forEach(([id,on])=>{
       const el=$(id); if(!el)return;
       const dot=el.querySelector('.dot'), sp=el.querySelector('.s');
       dot.style.background=on?'var(--ok)':'#3A4854';
@@ -909,16 +909,16 @@
 
   /* ---------- asset classes ---------- */
   const CLASSES={
-    core:   {name:'코어 코인',      gate:47, k:1.0,  note:'BTC · ETH'},
-    large:  {name:'대형 알트',      gate:57, k:0.7,  note:'SOL · XRP · LINK'},
-    small:  {name:'소형 알트',      gate:66, k:0.4,  note:'ENA · ARB · ONDO · XLM'},
-    equity: {name:'크립토 주식',    gate:57, k:0.6,  note:'COIN · HOOD · CRCL'}
+    core:   {name:'코어 코인',      gate:46, k:1.0,  note:'BTC · ETH'},
+    large:  {name:'대형 알트',      gate:56, k:0.7,  note:'SOL · XRP · LINK'},
+    small:  {name:'소형 알트',      gate:64, k:0.4,  note:'ENA · ARB · ONDO · XLM'},
+    equity: {name:'크립토 주식',    gate:56, k:0.6,  note:'COIN · HOOD · CRCL · BMNR'}
   };
   const DEFAULT_ROWS=[
     ['BTC','core'],['ETH','core'],
     ['SOL','large'],['XRP','large'],['LINK','large'],
     ['ONDO','small'],['XLM','small'],['ENA','small'],['ARB','small'],
-    ['COIN','equity'],['HOOD','equity'],['CRCL','equity']
+    ['COIN','equity'],['HOOD','equity'],['CRCL','equity'],['BMNR','equity']
   ];
   const blankRow=(n,c)=>({name:n,cls:c,tp:0,px:0,avg:0,ta:0,tq:0,cq:0});
   const GRP_OF={core:'coin',large:'coin',small:'coin',equity:'stock'};
@@ -1005,8 +1005,8 @@
     if(eqPct>12) f.push(`<div class="flag warn"><b>집중도 경고</b> — 크립토 주식 ${eqPct.toFixed(1)}%.
       COIN · HOOD · CRCL은 <b>거래량 = 매출</b>이라는 동일 팩터를 공유합니다. 분산이 아니라 한 종목을 셋으로 쪼갠 것에 가깝습니다.</div>`);
     const altPct=total>0?(((byCls.large||0)+(byCls.small||0))/total*100):0;
-    if(altPct>0&&(LAST.total||0)<57) f.push(`<div class="flag warn"><b>알트 게이트 잠김</b> — BTC ${LAST.total||0}점.
-      알트 신규 매수는 57점 이상에서만 개방됩니다. 지금은 기존 보유분 관리 구간입니다.</div>`);
+    if(altPct>0&&(LAST.total||0)<56) f.push(`<div class="flag warn"><b>알트 게이트 잠김</b> — BTC ${LAST.total||0}점.
+      알트 신규 매수는 56점 이상에서만 개방됩니다. 지금은 기존 보유분 관리 구간입니다.</div>`);
     const hitTp=rows.filter(r=>r.tp>0&&r.px>=r.tp).map(r=>r.name);
     if(hitTp.length) f.push(`<div class="flag ok"><b>익절가 도달</b> — ${hitTp.join(' · ')}. 전량이 아니라 분할로 덜어내십시오.</div>`);
     const nearTp=rows.filter(r=>r.tp>0&&r.px>0&&r.px<r.tp&&(r.tp/r.px-1)*100<=5).map(r=>r.name);
@@ -1176,6 +1176,13 @@
       name:String(r.name), cls:(CLASSES[r.cls]?r.cls:(r.cls==='infra'?'equity':'large')),
       tp:num(r.tp), px:num(r.px), avg:num(r.avg), ta:num(r.ta), tq:num(r.tq), cq:num(r.cq)}));
     if(!rows.length) rows=DEFAULT_ROWS.map(x=>blankRow(x[0],x[1]));
+    else{
+      const OLD=['Eaton (ETN)','Vertiv (VRT)','Bloom Energy (BE)','KODEX 487230','ETN','VRT','BE'];
+      const before=rows.length;
+      rows=rows.filter(r=>!(OLD.includes(r.name)&&!r.cq&&!r.avg&&!r.tq&&!r.tp));
+      if(!rows.some(r=>tickerOf(r)==='BMNR')) rows.push(blankRow('BMNR','equity'));
+      if(rows.length!==before||true) await savePort();
+    }
     const c=await sGet(DAYKEY); daily=c?JSON.parse(c):[];
     const ck=await sGet('btcscore:cgkey'); if(ck) $('d_cgkey').value=ck;
     const df=await sGet('btcscore:dfetch'); if(df) lastDFetch=df;
@@ -1254,9 +1261,9 @@
     const ys=v=>PT+(1-v/100)*(H-PT-PB);
     const yp=v=>PT+(1-(v-pMin)/(pMax-pMin))*(H-PT-PB);
     const path=(a,f)=>a.map((v,i)=>(i?'L':'M')+xs(i).toFixed(1)+' '+f(v).toFixed(1)).join(' ');
-    const zones=[[75,100,'#F0454B'],[66,75,'#F0454B'],[57,66,'#F08A3C'],[47,57,'#E8B33A'],[28,47,'#5C9CE0'],[0,28,'#4D9FFF']];
+    const zones=[[73,100,'#F0454B'],[64,73,'#F0454B'],[56,64,'#F08A3C'],[46,56,'#E8B33A'],[30,46,'#5C9CE0'],[0,30,'#4D9FFF']];
     let bg=zones.map(([a,b,c])=>`<rect x="${PL}" y="${ys(b)}" width="${W-PL-PR}" height="${ys(a)-ys(b)}" fill="${c}" opacity=".05"/>`).join('');
-    bg+=[28,47,57,66,75].map(v=>`<line x1="${PL}" y1="${ys(v)}" x2="${W-PR}" y2="${ys(v)}" stroke="#2A3742" stroke-dasharray="3 4"/><text x="${PL-7}" y="${ys(v)+3}" fill="#7C8C9B" font-size="10" font-family="ui-monospace,monospace" text-anchor="end">${v}</text>`).join('');
+    bg+=[30,46,56,64,73].map(v=>`<line x1="${PL}" y1="${ys(v)}" x2="${W-PR}" y2="${ys(v)}" stroke="#2A3742" stroke-dasharray="3 4"/><text x="${PL-7}" y="${ys(v)+3}" fill="#7C8C9B" font-size="10" font-family="ui-monospace,monospace" text-anchor="end">${v}</text>`).join('');
     const dots=records.map((r,i)=>`<circle cx="${xs(i).toFixed(1)}" cy="${ys(r.total).toFixed(1)}" r="4" fill="${cssv(tierOf(r.total).color)}"><title>${r.date} · ${r.total}점 · ${r.tier} · $${Math.round(r.price).toLocaleString('en-US')}</title></circle>`).join('');
     const pMid=(pMin+pMax)/2;
     const pAxis=[[pMax,yp(pMax)+10],[pMid,yp(pMid)+3],[pMin,yp(pMin)]].map(([v,y])=>
@@ -1639,29 +1646,51 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     const log=[];
     const cg=$('d_cgkey').value.trim();
     if(cg){
+      const CGU='https://open-api-v4.coinglass.com/api/etf/bitcoin/flow-history';
+      const pick=(o,keys)=>{for(const k of keys){ if(o[k]!==undefined&&o[k]!==null&&!isNaN(+o[k])) return +o[k]; } return null;};
+      const dstr=o=>{
+        const t=o.timestamp??o.time??o.date??o.ts;
+        if(t==null) return null;
+        if(typeof t==='number'||/^\d+$/.test(String(t))){
+          const n=+t; return new Date(n>1e12?n:n*1000).toISOString().slice(0,10);
+        }
+        const d2=new Date(t); return isNaN(d2)?null:d2.toISOString().slice(0,10);
+      };
       try{
-        const r=await fetch('https://open-api-v3.coinglass.com/api/etf/bitcoin/flow-history',
-          {headers:{'CG-API-KEY':cg,'accept':'application/json'},cache:'no-store'});
-        if(!r.ok) throw new Error(r.status);
+        const r=await fetch(CGU,{headers:{'CG-API-KEY':cg,'accept':'application/json'},cache:'no-store'});
+        if(!r.ok) throw new Error('HTTP '+r.status);
         const j=await r.json();
+        if(j && j.code!==undefined && String(j.code)!=='0' && j.success!==true)
+          throw new Error(j.msg||j.message||('code '+j.code));
         const arr=j.data||j.result||[];
-        if(!Array.isArray(arr)||!arr.length) throw new Error('empty');
-        let added=0;
+        if(!Array.isArray(arr)||!arr.length) throw new Error('빈 응답');
+        const px=+$('i_price').value||0;
+        let nBtc=0,nUsd=0;
         arr.forEach(x=>{
-          const ts=x.timestamp||x.date||x.time;
-          if(!ts) return;
-          const dt=new Date(typeof ts==='number'?(ts>1e12?ts:ts*1000):ts).toISOString().slice(0,10);
-          const v=x.changeBtc??x.flowBtc??x.netFlowBtc??x.totalBtc??x.value;
-          if(v==null||isNaN(+v)) return;
-          const ex=daily.find(y=>y.date===dt);
-          if(ex){ ex.etf=+v; } else { daily.push({date:dt,etf:+v,funding:null,hy:null,flow:0}); }
-          added++;
+          const dt=dstr(x); if(!dt) return;
+          const btc=pick(x,['change_btc','changeBtc','flow_btc','flowBtc','net_flow_btc','total_btc']);
+          const usd=pick(x,['flow_usd','flowUsd','change_usd','net_flow_usd','total_usd','value','flow']);
+          let ex=daily.find(y=>y.date===dt);
+          if(!ex){ ex={date:dt,etf:0,etfUsd:null,funding:null,hy:null,flow:0,senti:0}; daily.push(ex); }
+          if(btc!==null){ ex.etf=Math.round(btc); nBtc++; }
+          if(usd!==null){ ex.etfUsd=usd; nUsd++;
+            if(btc===null && px>0) ex.etf=Math.round(usd/px); }
         });
-        daily.sort((a,b)=>a.date<b.date?-1:1);
+        daily.sort((x,y)=>x.date<y.date?-1:1);
         await sSet(DAYKEY,JSON.stringify(daily));
         sSet('btcscore:cgkey',cg);
-        log.push(`<span style="color:var(--ok)">✓</span> CoinGlass ETF 순유입 · ${added}일 반영`);
-      }catch(e){ log.push('<span style="color:var(--alarm)">✗</span> CoinGlass 조회 실패 — 키 확인 또는 브라우저 차단(CORS). 수동 입력하십시오'); }
+        log.push(`<span style="color:var(--ok)">✓</span> CoinGlass v4 ETF · ${arr.length}일`
+          +(nBtc?` · BTC ${nBtc}건`:'')+(nUsd?` · USD ${nUsd}건`:'')
+          +(!nBtc&&nUsd?' <span style="color:var(--dim)">(BTC는 현재가로 환산)</span>':''));
+      }catch(e){
+        const m=(e&&e.message)?e.message:'차단';
+        const hint=/upgrade|401|plan/i.test(m)
+          ? '계정에 활성 플랜이 없습니다. CoinGlass → Pricing에서 무료 Hobbyist 플랜을 구독한 뒤 다시 시도하십시오.'
+          : (/403|429/.test(m) ? '호출 한도 또는 권한 문제입니다. 잠시 뒤 다시 시도하십시오.'
+                               : '브라우저 차단(CORS)일 수 있습니다.');
+        log.push('<span style="color:var(--alarm)">✗</span> CoinGlass 실패 — '+m
+          +' <span style="color:var(--dim)">· '+hint+' 아래 표 붙여넣기는 항상 동작합니다.</span>');
+      }
     }
     try{
       const p=await jget('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT');
@@ -1973,9 +2002,9 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
 
     const won=v=>Math.round(v).toLocaleString('ko-KR')+'만원';
     const setEm=(id,txt)=>{const e=document.querySelector('#'+id+' .t em'); if(e)e.textContent=txt;};
-    setEm('lk1',`1층 · DCA ${dca}% · ${won(dcaAmt)} · 28점 이상`);
-    setEm('lk2',`2층 · 사다리 ${(100-dca-res).toFixed(0)}% · ${won(ladAmt)} · 57점 이상`);
-    setEm('lk3',`3층 · 예비 ${res}% · ${won(resAmt)} · 75점 · 200MA하회+공포20 · HY 4.0%`);
+    setEm('lk1',`1층 · DCA ${dca}% · ${won(dcaAmt)} · 30점 이상`);
+    setEm('lk2',`2층 · 사다리 ${(100-dca-res).toFixed(0)}% · ${won(ladAmt)} · 56점 이상`);
+    setEm('lk3',`3층 · 예비 ${res}% · ${won(resAmt)} · 73점 · 200MA하회+공포20 · HY 4.0%`);
 
     const allocSum=lad.reduce((a,t)=>a+t.alloc,0);
     const remain=lad.filter(t=>!t.done).reduce((a,t)=>a+ladAmt*t.alloc/100,0);
@@ -2070,7 +2099,9 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     return r.map(k=>({t:k[0],c:+k[4]}));
   }
   async function textVia(url){
-    const cands=[url,'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
+    const cands=[url,
+      'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url),
+      'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
       'https://corsproxy.io/?url='+encodeURIComponent(url)];
     let last;
     for(const u of cands){
@@ -2081,12 +2112,18 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   }
   async function jgetVia(url){
     const cands=[url,
+      'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url),
       'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
-      'https://corsproxy.io/?url='+encodeURIComponent(url)];
+      'https://corsproxy.io/?url='+encodeURIComponent(url),
+      'https://api.allorigins.win/get?url='+encodeURIComponent(url)];
     let last;
     for(const u of cands){
-      try{ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-        return JSON.parse(await r.text()); }catch(e){ last=e; }
+      try{
+        const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+        let t=await r.text();
+        if(u.includes('/get?url=')){ const j=JSON.parse(t); t=j.contents||''; }
+        return JSON.parse(t);
+      }catch(e){ last=e; }
     }
     throw last||new Error('fetch fail');
   }
@@ -2147,7 +2184,12 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       if(kind==='coin') await asCoin();
       else if(kind==='stock') await asStock();
       else { try{ await asCoin(); }catch(e){ await asStock(); } }
-    }catch(e){ return {sym,kind:'—',err:'조회 실패 — 티커를 확인하십시오'}; }
+    }catch(e){
+      const stock=(kind!=='coin');
+      return {sym,kind:'—',err:(stock&&!key)
+        ? '조회 실패 — 주식은 Twelve Data 키를 넣으면 대부분 해결됩니다'
+        : '조회 실패 — 티커를 확인하십시오'};
+    }
     const label = src==='Binance' ? '코인 · Binance' : '주식 · '+src;
     const j=judge(d.map(x=>x.c),toWeekly(d),toMonthly(d));
     return j?{sym,kind:label,px:d[d.length-1].c,...j}:{sym,kind:label,err:'데이터 부족'};
