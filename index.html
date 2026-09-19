@@ -175,7 +175,7 @@
   <div class="mast">
     <div>
       <h1>매집 계기반</h1>
-      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-09-19 R61</span></div>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-09-19 R62</span></div>
     </div>
     <div class="total">
       <div class="n" id="totalN">—</div>
@@ -403,6 +403,24 @@
           <div class="toast" id="toast3"></div>
           <div class="note" id="dFetchLog">펀딩비·HY 스프레드를 자동으로 채웁니다. 앱을 열 때 마지막 갱신이 12시간을 넘으면 자동 실행됩니다.
             ETF 순유입은 아래 <b>표 붙여넣기</b>, 거래소 순입출금은 <b>직접 입력</b>입니다.</div>
+        </div>
+        <div class="card" id="flowCard">
+          <header><h2>자금 흐름 그래프</h2>
+            <div class="secscore"><span id="fcRange" style="color:var(--dim);font-size:11px">—</span></div></header>
+          <div class="subtabs" style="flex-wrap:wrap;gap:4px 10px;margin-bottom:9px">
+            <button data-fsrc="etf" class="on">ETF 순유입</button>
+            <button data-fsrc="flow">거래소 순입출금</button>
+            <span style="width:10px"></span>
+            <button data-funit="btc" class="on">BTC 수량</button>
+            <button data-funit="usd">USD 금액</button>
+            <span style="width:10px"></span>
+            <button data-fdays="14">14일</button>
+            <button data-fdays="30" class="on">30일</button>
+            <button data-fdays="60">60일</button>
+            <button data-fdays="0">전체</button>
+          </div>
+          <div id="fcChart"></div>
+          <div class="note" id="fcSum" style="margin-top:7px">—</div>
         </div>
         <div class="card">
           <header><h2>최근 14일</h2><div class="secscore"><span id="dCount" style="color:var(--dim);font-size:11px">0건</span></div></header>
@@ -1678,7 +1696,90 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
             <td style="color:${(r.senti||0)>0?'var(--buy)':((r.senti||0)<0?'var(--sell)':'var(--dim)')}">${r.senti>0?'호재':(r.senti<0?'악재':'—')}</td></tr>`).join('')}</tbody></table>`
       : '<div class="empty">저장된 일일 기록이 없습니다.</div>';
     sSet(DAYKEY,JSON.stringify(daily));
+    try{ drawFlow(); }catch(err){ console.error('drawFlow',err); }
   }
+
+
+  /* ---------- 일일 자금 흐름 그래프 ---------- */
+  let fcState={src:'etf',unit:'btc',days:30};
+  const fcFmt=(v,unit)=> unit==='usd'
+      ? (v>0?'+':v<0?'-':'')+'$'+cmpUSD(Math.abs(v))
+      : (v>0?'+':'')+Math.round(v).toLocaleString('ko-KR')+' BTC';
+  function drawFlow(){
+    const box=$('fcChart'); if(!box) return;
+    const {src,unit,days}=fcState;
+    document.querySelectorAll('[data-fsrc]').forEach(b=>b.classList.toggle('on',b.dataset.fsrc===src));
+    document.querySelectorAll('[data-funit]').forEach(b=>b.classList.toggle('on',b.dataset.funit===unit));
+    document.querySelectorAll('[data-fdays]').forEach(b=>b.classList.toggle('on',+b.dataset.fdays===days));
+
+    if(src==='flow'&&unit==='usd'){
+      box.innerHTML='<div class="empty">거래소 순입출금은 BTC 수량만 기록됩니다. 금액 환산 데이터가 없습니다.</div>';
+      $('fcSum').textContent='—'; $('fcRange').textContent='—'; return;
+    }
+    const val=r=> src==='etf' ? (unit==='usd'? (r.etfUsd==null?null:+r.etfUsd) : (+r.etf||0))
+                              : (+r.flow||0);
+    let list=daily.slice().sort((a,b)=>a.date<b.date?-1:1).filter(r=>val(r)!==null);
+    if(days>0) list=list.slice(-days);
+    if(!list.length){
+      box.innerHTML='<div class="empty">'+(src==='etf'&&unit==='usd'
+        ? 'USD 금액 기록이 없습니다. 「ETF 표 붙여넣기」 단위를 USD로 두고 반영하면 쌓입니다.'
+        : '저장된 일일 기록이 없습니다.')+'</div>';
+      $('fcSum').textContent='—'; $('fcRange').textContent='—'; return;
+    }
+    // 강세 방향: ETF는 유입(+), 거래소는 유출(-)이 축적
+    const good=v=> src==='etf' ? v>0 : v<0;
+    const vals=list.map(val);
+    let cum=0; const cums=vals.map(v=>(cum+=v));
+    const W=760,H=252,PL=58,PR=62,PT=16,PB=34,n=list.length;
+    const iw=(W-PL-PR)/Math.max(n,1);
+    const bw=Math.max(2,Math.min(20,iw*0.66));
+    const xc=i=>PL+iw*(i+0.5);
+    const vmax=Math.max(...vals,0), vmin=Math.min(...vals,0);
+    const pad=(vmax-vmin)*0.12||1;
+    const hi=vmax+pad, lo=vmin-pad;
+    const y=v=>PT+(hi-v)/(hi-lo)*(H-PT-PB);
+    const cHi=Math.max(...cums,0), cLo=Math.min(...cums,0);
+    const cPad=(cHi-cLo)*0.12||1;
+    const yc=v=>PT+((cHi+cPad)-v)/((cHi+cPad)-(cLo-cPad))*(H-PT-PB);
+    const y0=y(0);
+    const bars=list.map((r,i)=>{
+      const v=vals[i], top=Math.min(y(v),y0), h=Math.max(1.5,Math.abs(y(v)-y0));
+      const col=v===0?'#3A4854':(good(v)?'var(--buy)':'var(--sell)');
+      return `<rect x="${(xc(i)-bw/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}"
+        fill="${col}" opacity="${v===0?0.5:0.85}"><title>${r.date} · ${fcFmt(v,unit)} · 누적 ${fcFmt(cums[i],unit)}</title></rect>`;}).join('');
+    const cpath=cums.map((v,i)=>(i?'L':'M')+xc(i).toFixed(1)+' '+yc(v).toFixed(1)).join(' ');
+    const shortN=v=> unit==='usd'? cmpUSD(v) : Math.round(v).toLocaleString('ko-KR');
+    const gl=[hi,(hi+lo)/2,0,lo].filter((v,i,a)=>a.indexOf(v)===i).map(v=>
+      `<line x1="${PL}" y1="${y(v).toFixed(1)}" x2="${W-PR}" y2="${y(v).toFixed(1)}"
+         stroke="${Math.abs(v)<1e-9?'#4A5A68':'#232E37'}" stroke-dasharray="${Math.abs(v)<1e-9?'':'3 4'}"/>
+       <text x="${PL-7}" y="${(y(v)+3).toFixed(1)}" fill="#7C8C9B" font-size="10" font-family="ui-monospace,monospace" text-anchor="end">${shortN(v)}</text>`).join('');
+    const cax=[cHi,cLo].filter((v,i,a)=>a.indexOf(v)===i).map(v=>
+      `<text x="${W-PR+7}" y="${(yc(v)+3).toFixed(1)}" fill="#C97A2E" font-size="10" font-family="ui-monospace,monospace">${shortN(v)}</text>`).join('');
+    const every=Math.ceil(n/10);
+    const xl=list.map((r,i)=> (i%every===0||i===n-1)
+      ? `<text x="${xc(i).toFixed(1)}" y="${H-12}" fill="#7C8C9B" font-size="9.5" font-family="ui-monospace,monospace" text-anchor="middle">${r.date.slice(5)}</text>`:'').join('');
+    box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+      ${gl}${bars}<path d="${cpath}" fill="none" stroke="#F5A623" stroke-width="2" opacity=".9"/>${cax}${xl}</svg>
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:5px;font-family:var(--mono);font-size:10.5px;color:var(--dim);flex-wrap:wrap">
+        <span><span style="display:inline-block;width:11px;height:9px;background:var(--buy);vertical-align:middle"></span> ${src==='etf'?'유입(강세)':'유출 · 축적(강세)'}</span>
+        <span><span style="display:inline-block;width:11px;height:9px;background:var(--sell);vertical-align:middle"></span> ${src==='etf'?'유출(약세)':'유입 · 분배(약세)'}</span>
+        <span><span style="display:inline-block;width:14px;height:2px;background:#F5A623;vertical-align:middle"></span> 누적(오른쪽 축)</span></div>`;
+
+    const tot=vals.reduce((a,b)=>a+b,0);
+    const up=vals.filter(v=>good(v)).length, dn=vals.filter(v=>v!==0&&!good(v)).length;
+    const mx=list[vals.indexOf(Math.max(...vals))], mn=list[vals.indexOf(Math.min(...vals))];
+    $('fcRange').textContent=`${list[0].date} ~ ${list[n-1].date} · ${n}일`;
+    $('fcSum').innerHTML=`기간 합계 <b style="color:${good(tot)?'var(--buy)':'var(--sell)'}">${fcFmt(tot,unit)}</b>`
+      +` · 강세일 <b style="color:var(--buy)">${up}</b> / 약세일 <b style="color:var(--sell)">${dn}</b>`
+      +` · 최대 유입 <b>${fcFmt(Math.max(...vals),unit)}</b> (${mx.date})`
+      +` · 최대 유출 <b>${fcFmt(Math.min(...vals),unit)}</b> (${mn.date})`;
+  }
+  document.addEventListener('click',e=>{
+    const t=e.target; if(!t.dataset) return;
+    if(t.dataset.fsrc){ fcState.src=t.dataset.fsrc; drawFlow(); }
+    else if(t.dataset.funit){ fcState.unit=t.dataset.funit; drawFlow(); }
+    else if(t.dataset.fdays!==undefined){ fcState.days=+t.dataset.fdays; drawFlow(); }
+  });
 
   $('btnDSave').onclick=async()=>{
     const date=$('d_date').value||new Date().toISOString().slice(0,10);
