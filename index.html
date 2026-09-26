@@ -175,7 +175,7 @@
   <div class="mast">
     <div>
       <h1>매집 계기반</h1>
-      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-09-19 R62</span></div>
+      <div class="sub">WEEKLY ACCUMULATION CONSOLE · BTC 100 PT · <span id="ver" title="클릭하면 캐시를 무시하고 새로 불러옵니다" style="cursor:pointer">BUILD 2026-09-26 R70</span></div>
     </div>
     <div class="total">
       <div class="n" id="totalN">—</div>
@@ -275,7 +275,7 @@
         <div class="row"><div class="lab">DXY <em data-rule="dxy">—</em></div><input id="i_dxy" type="number" step="0.01" value="99.67">
           <div class="pts"><div class="bars" data-bars="dxy"></div><div class="v" id="p_dxy">0</div></div></div>
         <div class="row"><div class="lab">Fed 정책 <span class="man">수동</span> <em data-rule="fed">—</em></div>
-          <select id="i_fed"><option value="2">인하</option><option value="1" selected>동결</option><option value="0">인상</option></select>
+          <select id="i_fed"><option value="2">인하</option><option value="1">동결</option><option value="0" selected>인상</option></select>
           <div class="pts"><div class="bars" data-bars="fed"></div><div class="v" id="p_fed">0</div></div></div>
       </div>
 
@@ -352,7 +352,7 @@
           <div class="lab">기준일</div><input id="i_date" type="date"></div>
         <div class="btns">
           <button class="b primary" id="btnSave">이번 주 저장</button>
-          <button class="b" id="btnSeed">백테스트 15주</button>
+          <button class="b" id="btnSeed">백테스트 19주</button>
         </div>
         <div class="toast" id="toast"></div>
       </div>
@@ -365,17 +365,17 @@
     <div class="grid grid-p">
       <div>
         <div class="card">
-          <header><h2>오늘 수치</h2><div class="secscore"><span id="dFetchTime" style="color:var(--dim);font-size:11px">—</span></div></header>
+          <header><h2>오늘 수치</h2><div class="secscore">
+            <span id="dDateState" style="font-size:11px;margin-right:9px">—</span>
+            <span id="dFetchTime" style="color:var(--dim);font-size:11px">—</span></div></header>
           <div class="row" style="grid-template-columns:1fr 130px;border:0;padding:0 0 8px">
             <div class="lab">기준일</div><input id="d_date" type="date"></div>
-          <div class="row"><div class="lab">ETF 일일 순유입 <em>BTC 수량 · 유출은 음수로 (CoinGlass 총계)</em></div>
-            <input id="d_etf" type="number" step="1" value="0"><div></div></div>
-          <div class="row"><div class="lab">펀딩비 % <em>8시간 기준</em></div>
+          <div class="row"><div class="lab">펀딩비 % <em id="srcFund">8시간 기준 · Binance · 미조달</em></div>
             <input id="d_fund" type="number" step="0.0001" value="0.0045"><div></div></div>
-          <div class="row"><div class="lab">HY 스프레드 % <em>FRED BAMLH0A0HYM2</em></div>
+          <div class="row"><div class="lab">HY 스프레드 % <em id="srcHy">FRED BAMLH0A0HYM2 · <b style="color:var(--warn)">미조달 — 화면값은 기본값</b></em></div>
             <input id="d_hy" type="number" step="0.01" value="2.70"><div></div></div>
-          <div class="row"><div class="lab">거래소 순입출금 <em>BTC · 유출(축적)은 음수로</em></div>
-            <input id="d_flow" type="number" step="10" value="0"><div></div></div>
+          <div class="row"><div class="lab">손실 중인 공급량 <span class="man">수동</span> <em id="srcLoss">ForeDex · 백만 BTC · 참고용 · 채점 제외</em></div>
+            <input id="d_loss" type="number" step="0.01" placeholder="—"><div></div></div>
           <div class="row" style="grid-template-columns:1fr;padding:11px 0 4px">
             <div class="lab" style="color:var(--phos);font-size:11px;letter-spacing:.14em">ETF 표 붙여넣기</div></div>
           <div class="row" style="grid-template-columns:1fr;border:0;padding:0">
@@ -404,15 +404,37 @@
           <div class="note" id="dFetchLog">펀딩비·HY 스프레드를 자동으로 채웁니다. 앱을 열 때 마지막 갱신이 12시간을 넘으면 자동 실행됩니다.
             ETF 순유입은 아래 <b>표 붙여넣기</b>, 거래소 순입출금은 <b>직접 입력</b>입니다.</div>
         </div>
+    <div class="card">
+      <header><h2>자산별 ETF 표 붙여넣기</h2>
+        <div class="secscore"><span id="flowCount" style="color:var(--dim);font-size:11px">—</span></div></header>
+      <div class="row" style="grid-template-columns:1fr 140px;border:0;padding:0 0 8px">
+        <div class="lab">자산 <em>표를 붙여넣기 전에 자산을 먼저 지정하십시오</em></div>
+        <input id="f_asset" list="assetList" style="text-align:left" placeholder="ETH · SOL · XRP · HYPE">
+        <datalist id="assetList"><option value="BTC"><option value="ETH"><option value="SOL"><option value="XRP"><option value="HYPE"></datalist>
+      </div>
+      <textarea id="f_paste" rows="4" placeholder="CoinGlass 자산별 ETF 페이지의 일별 표를 복사해 붙여넣으십시오.&#10;가로·세로 어느 형태로 복사되어도 인식합니다."
+        style="width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+        border-radius:4px;padding:7px;font-family:var(--mono);font-size:11.5px;resize:vertical"></textarea>
+      <div class="btns" style="margin-top:8px">
+        <button class="b primary" id="btnFlow">붙여넣은 표 반영</button>
+        <button class="b ghost" id="btnFlowClear">전체 비우기</button>
+      </div>
+      <div class="toast" id="toast6"></div>
+      <div class="note" id="flowChips" style="margin:0 0 8px">등록된 자산 없음</div>
+      <div class="xscroll" id="flowTable"></div>
+      <div class="note">날짜 뒤(또는 아래) <b>마지막 숫자(Total 열)</b>를 읽고 K·M·B 단위를 변환합니다.
+        <b>단기 10영업일과 구조 40영업일의 부호 조합</b>으로 판정하므로 단위는 자산별로만 일관되면 됩니다.
+        차트 이미지나 히트맵은 텍스트가 아니라 읽을 수 없습니다.</div>
+    </div>
+
         <div class="card" id="flowCard">
           <header><h2>자금 흐름 그래프</h2>
             <div class="secscore"><span id="fcRange" style="color:var(--dim);font-size:11px">—</span></div></header>
           <div class="subtabs" style="flex-wrap:wrap;gap:4px 10px;margin-bottom:9px">
-            <button data-fsrc="etf" class="on">ETF 순유입</button>
-            <button data-fsrc="flow">거래소 순입출금</button>
+            <span id="fcAssets" style="display:flex;gap:4px;flex-wrap:wrap"></span>
             <span style="width:10px"></span>
-            <button data-funit="btc" class="on">BTC 수량</button>
-            <button data-funit="usd">USD 금액</button>
+            <button data-funit="btc" class="on" id="fcUnitBtc">BTC 수량</button>
+            <button data-funit="usd" id="fcUnitUsd">USD 금액</button>
             <span style="width:10px"></span>
             <button data-fdays="14">14일</button>
             <button data-fdays="30" class="on">30일</button>
@@ -524,31 +546,22 @@
     </div>
 
     <div class="card">
-      <header><h2>자산별 ETF 자금흐름 · 표 붙여넣기</h2>
-        <div class="secscore"><span id="flowCount" style="color:var(--dim);font-size:11px">—</span></div></header>
-      <div class="row" style="grid-template-columns:1fr 140px;border:0;padding:0 0 8px">
-        <div class="lab">자산 <em>표를 붙여넣기 전에 자산을 먼저 지정하십시오</em></div>
-        <input id="f_asset" list="assetList" style="text-align:left" placeholder="ETH · SOL · XRP · HYPE">
-        <datalist id="assetList"><option value="BTC"><option value="ETH"><option value="SOL"><option value="XRP"><option value="HYPE"></datalist>
-      </div>
-      <textarea id="f_paste" rows="4" placeholder="CoinGlass 자산별 ETF 페이지의 일별 표를 복사해 붙여넣으십시오.&#10;가로·세로 어느 형태로 복사되어도 인식합니다."
-        style="width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
-        border-radius:4px;padding:7px;font-family:var(--mono);font-size:11.5px;resize:vertical"></textarea>
-      <div class="btns" style="margin-top:8px">
-        <button class="b primary" id="btnFlow">붙여넣은 표 반영</button>
-        <button class="b ghost" id="btnFlowClear">전체 비우기</button>
-      </div>
-      <div class="toast" id="toast6"></div>
-      <div class="note" id="flowChips" style="margin:0 0 8px">등록된 자산 없음</div>
-      <div class="xscroll" id="flowTable"></div>
-      <div class="note">날짜 뒤(또는 아래) <b>마지막 숫자(Total 열)</b>를 읽고 K·M·B 단위를 변환합니다.
-        <b>단기 10영업일과 구조 40영업일의 부호 조합</b>으로 판정하므로 단위는 자산별로만 일관되면 됩니다.
-        차트 이미지나 히트맵은 텍스트가 아니라 읽을 수 없습니다.</div>
-    </div>
-
-    <div class="card">
       <header><h2>종목별 판정</h2><div class="secscore"><span id="trCount" style="color:var(--dim);font-size:11px">—</span></div></header>
       <div class="xscroll" id="trTable"><div class="empty">위에서 종목을 하나 검색하거나, 전체 목록을 일괄 분석하십시오.</div></div>
+    </div>
+    <div class="card">
+      <header><h2>판정 이력</h2>
+        <div class="secscore"><span id="trLogCount" style="color:var(--dim);font-size:11px">0건</span></div></header>
+      <div class="row" style="grid-template-columns:1fr 176px;padding:0 0 10px;gap:9px">
+        <div class="lab">종목으로 걸러보기 <em>분석했던 종목만 나옵니다</em></div>
+        <select id="trLogSel"><option value="">전체</option></select>
+      </div>
+      <div class="xscroll" id="trLogTable"></div>
+      <div class="btns" style="margin-top:10px">
+        <button class="b ghost" id="btnTrLogClear">이력 전체 삭제</button>
+      </div>
+      <div class="note">분석할 때마다 결과가 자동으로 쌓입니다. 같은 종목·같은 날 다시 분석하면 그날 기록을 덮어씁니다.
+        종목당 최근 <b>60건</b>, 전체 <b>1,000건</b>까지 보관합니다.</div>
       <div class="note">
         <b style="color:var(--phos)">일봉 정배열</b> WMA 5 &gt; 20 &gt; 60 · <b style="color:var(--phos)">일봉 크로스</b> WMA5가 WMA60을 상향/하향 돌파 ·
         <b style="color:var(--phos)">주봉 크로스</b> WMA5주가 WMA20주를 상향/하향 돌파 ·
@@ -653,6 +666,21 @@
       <header><h2>점수 · 가격 추이</h2><div class="secscore"><span id="recCount">0건</span></div></header>
       <div id="chartWrap"><div class="empty">저장된 기록이 없습니다.</div></div>
       <div class="scroll" id="tableWrap"></div>
+    </div>
+    <div class="card" id="simCard">
+      <header><h2>집행 시뮬레이션</h2>
+        <div class="secscore"><span id="simRange" style="color:var(--dim);font-size:11px">—</span></div></header>
+      <div class="row" style="grid-template-columns:1fr 176px;padding:0 0 10px;gap:9px">
+        <div class="lab">주간 기본액 <em>1층 DCA 1주분 · 만원</em></div>
+        <input id="sim_base" type="number" step="1" value="100">
+      </div>
+      <div class="row" style="grid-template-columns:1fr 176px;padding:0 0 11px;gap:9px">
+        <div class="lab">평가 기준가 <em id="simPxSrc">—</em></div>
+        <input id="sim_px" type="number" step="1" placeholder="BTC $">
+      </div>
+      <div class="scroll" id="simTable"></div>
+      <div id="simChart" style="margin-top:11px"></div>
+      <div class="note" id="simNote" style="margin-top:9px">—</div>
     </div>
     <div class="card">
       <header><h2>내보내기</h2></header>
@@ -803,7 +831,7 @@
     fg:gv('i_fg',50), sopr:gv('i_sopr',1), prem:gv('i_prem',0),
     stableRaw:gv('i_stableRaw',0), btcRaw:gv('i_btcRaw',0),
     etf8:gv('i_etf8',0), etf2:gv('i_etf2',0),
-    m2Raw:gv('i_m2Raw',0), dxy:gv('i_dxy',100), fed:gv('i_fed',1),
+    m2Raw:gv('i_m2Raw',0), dxy:gv('i_dxy',100), fed:gv('i_fed',0),
     oi:gv('i_oi',0), taker:gv('i_taker',50)});
 
   function supplyMetrics(d){
@@ -1209,7 +1237,7 @@
     _dt=setTimeout(()=>{
       const o={}; Object.keys(RAWMAP).forEach(k=>o[k]=$(RAWMAP[k]).value);
       o._base=$('i_base').value; o._nav=$('i_nav').value; o._cash=$('i_cash').value;
-      o._fetched=lastFetch||'';
+      o._fetched=lastFetch||''; o._fed0916=1;
       sSet(DKEY,JSON.stringify(o));
     },500);
   }
@@ -1218,6 +1246,7 @@
     try{
       const o=JSON.parse(s);
       Object.keys(RAWMAP).forEach(k=>{ if(o[k]!==undefined&&o[k]!=='') $(RAWMAP[k]).value=o[k]; });
+      if(!o._fed0916){ if(String(o.fed)==='1') $('i_fed').value='0'; }
       if(o._base) $('i_base').value=o._base;
       if(o._nav) $('i_nav').value=o._nav;
       if(o._cash) $('i_cash').value=o._cash;
@@ -1253,7 +1282,8 @@
       if(!rows.some(r=>tickerOf(r)==='BMNR')) rows.push(blankRow('BMNR','equity'));
       if(rows.length!==before||true) await savePort();
     }
-    const c=await sGet(DAYKEY); daily=c?JSON.parse(c):[];
+    const c=await sGet(DAYKEY); daily=c?JSON.parse(c):[]; dailyReady=true;
+
     const ck=await sGet('btcscore:cgkey'); if(ck) $('d_cgkey').value=ck;
     const df=await sGet('btcscore:dfetch'); if(df) lastDFetch=df;
     const ud=await sGet('btcscore:usdtd'); if(ud&&$('m_usdtd')) $('m_usdtd').value=ud;
@@ -1262,6 +1292,8 @@
     if(lk){try{const o=JSON.parse(lk);
       if(o.fx!=null)$('i_fx').value=o.fx; if(o.up!=null)$('i_upbit').value=o.up;
       if(o.bi!=null)$('i_bithumb').value=o.bi; if(o.bn!=null)$('i_binance').value=o.bn;}catch(x){}}
+    try{ const tl=await sGet(TRLOGKEY); if(tl) trLog=JSON.parse(tl)||[]; }catch(e){ trLog=[]; }
+    try{ const tc=await sGet('btcscore:trendcur'); if(tc) trResults=JSON.parse(tc)||[]; }catch(e){}
     const tset=await sGet('btcscore:trend');
     if(tset){try{const o=JSON.parse(tset);
       if(o.key)$('tr_key').value=o.key;}catch(x){}}
@@ -1275,7 +1307,8 @@
         if(same) o.lad.forEach((t,i)=>{ t.lo=LAD_DEFAULT[i].lo; t.hi=LAD_DEFAULT[i].hi; });
       }
       if(o.dca!=null)$('l_dca').value=o.dca; if(o.res!=null)$('l_res').value=o.res;}catch(x){}}
-    [renderDaily,render,renderPortfolio,renderLadder,drawLog,freshness,renderFlows,fillTrSelect].forEach(fn=>{
+    booted=true;
+    [loadDailyInputs,render,renderPortfolio,renderLadder,drawLog,freshness,renderFlows,fillTrSelect,renderTr,renderTrLog].forEach(fn=>{
       try{ fn(); }catch(err){ if(window.__fatal)window.__fatal(fn.name,err); else console.error(fn.name,err); }});
   }
   const saveRec=()=>sSet(KEY,JSON.stringify(records));
@@ -1313,24 +1346,109 @@
     ['2026-08-07',64880,63670,1.23,0.876,29,0.992,-0.95,58806,2792,12621,-24835,120.26,99.80],
     ['2026-08-14',63400,63860,1.20,0.906,29,0.995,-0.36,58469,2810,8394,-26484,123.27,99.65],
     ['2026-08-21',78340,64130,1.49,1.100,72,1.000,-1.10,58752,2826,24483,32134,123.09,98.80],
-    ['2026-08-28',77830,64430,1.47,1.100,73,1.000,0.325,59090,2833,41448,53764,123.91,99.67]
+    ['2026-08-28',77830,64430,1.47,1.100,73,1.000,0.325,59090,2833,41448,53764,123.91,99.67,1],
+    /* 아래 4주 — ForeDex 시트(09-25판). 메이어·DXY는 추정, M2는 자료 없음(null=중립 2점) */
+    ['2026-09-04',79600,64700,1.50,1.124,74,1.000,0.800,58208,2839,21729,60592,null,99.40,1],
+    ['2026-09-11',77170,65140,1.45,1.087,56,1.000,1.300,58027,2838, 3994,53491,null,99.10,1],
+    ['2026-09-18',80900,65320,1.52,1.136,56,1.000,-0.570,58206,2842,-5713,53120,null,100.30,0],
+    ['2026-09-25',84380,65610,1.57,1.182,71,1.000,0.280,58516,2836,27043,80879,null,101.06,0]
   ];
+  /* 시드에서 추정치가 섞인 주차 — 화면에 그대로 밝힌다 */
+  const SEED_EST={'2026-09-04':'메이어·DXY 추정 · M2 없음','2026-09-11':'메이어·DXY 추정 · M2 없음',
+                  '2026-09-18':'메이어·DXY 추정 · M2 없음','2026-09-25':'메이어 추정 · M2 없음'};
   $('btnSeed').onclick=async()=>{
     SEED.forEach(a=>{
       const d={date:a[0],price:a[1],ma:a[2],mvrv:a[3],mayer:a[4],fg:a[5],sopr:a[6],prem:a[7],
-        stableRaw:a[8],btcRaw:a[9],etf2:a[10]||0,etf8:a[11]||0,m2Raw:a[12],dxy:a[13],fed:1,oi:0,taker:50};
+        stableRaw:a[8],btcRaw:a[9],etf2:a[10]||0,etf8:a[11]||0,m2Raw:a[12],dxy:a[13],fed:a[14]??1,oi:0,taker:50};
       const r=score(d); records=records.filter(x=>x.date!==a[0]);
       records.push({date:a[0],raw:d,price:a[1],ma:a[2],mvrv:a[3],mayer:a[4],fg:a[5],sopr:a[6],prem:a[7],
-        total:r.total,A:r.A,B:r.B,C:r.C,D:r.D,E:r.E,tier:tierOf(r.total).name});});
+        total:r.total,A:r.A,B:r.B,C:r.C,D:r.D,E:r.E,tier:tierOf(r.total).name,est:SEED_EST[a[0]]||null});});
     records.sort((x,y)=>x.date<y.date?-1:1);
-    await saveRec(); drawLog(); render(); freshness(); toast('백테스트 15주를 불러왔습니다.');
+    await saveRec(); drawLog(); render(); freshness();
+    const nEst=SEED.filter(a=>SEED_EST[a[0]]).length;
+    toast(`백테스트 ${SEED.length}주를 불러왔습니다${nEst?` · 최근 ${nEst}주는 일부 추정치`:''}.`);
   };
 
+
+  /* ---------- 집행 시뮬레이션 ----------
+     기록된 주차마다 판정 배속대로 샀다면 평단가가 어떻게 됐는지 계산한다.
+     비교 대상은 두 가지: 같은 기본액을 매주 균등 투입 / 같은 총액을 균등 분배.
+     평단가는 USD 기준이라 환율과 무관하지만, 투입·평가 금액은 환율 고정을 가정한다. */
+  function drawSim(){
+    const box=$('simTable'); if(!box) return;
+    const base=+$('sim_base').value||0;
+    const recs=records.slice().filter(r=>r.price>0).sort((a,b)=>a.date<b.date?-1:1);
+    if(recs.length<2){
+      box.innerHTML='<div class="empty">기록이 2주 이상 있어야 계산합니다. 「백테스트 19주」를 눌러 보십시오.</div>';
+      $('simChart').innerHTML=''; $('simNote').textContent='—'; $('simRange').textContent='—'; return;
+    }
+    // 평가 기준가: 직접 입력 > 채점 탭 현재가 > 마지막 기록가
+    const manual=+$('sim_px').value||0;
+    const live=+($('i_price')&&$('i_price').value)||0;
+    const lastRec=recs[recs.length-1];
+    const px = manual>0?manual : (live>0?live : lastRec.price);
+    $('simPxSrc').textContent = manual>0 ? '직접 입력'
+      : (live>0 ? `채점 탭 현재가 $${Math.round(live).toLocaleString('en-US')}` 
+                : `마지막 기록 ${lastRec.date} $${Math.round(lastRec.price).toLocaleString('en-US')}`);
+
+    const multOf=t=>{const m=tierOf(t).mult; return m==='ALL'?3:m;};
+    let cS=0,qS=0,cE=0,qE=0; const path=[];
+    recs.forEach(r=>{
+      const m=multOf(r.total), aS=base*m, aE=base;
+      cS+=aS; qS+=aS/r.price; cE+=aE; qE+=aE/r.price;
+      path.push({date:r.date, avgS:qS?cS/qS:0, avgE:qE?cE/qE:0, px:r.price});
+    });
+    const avgS=cS/qS, avgE=cE/qE;
+    // 같은 총액을 균등 분배 → 평단은 균등 DCA와 동일, 규모만 맞춘 비교
+    const cF=cS, qF=cF/avgE;
+    const row=(nm,c,q,avg,tag)=>`<tr><td style="white-space:nowrap">${nm}${tag||''}</td>
+      <td>${Math.round(c).toLocaleString('ko-KR')}</td>
+      <td>$${Math.round(avg).toLocaleString('en-US')}</td>
+      <td>${Math.round(q*px).toLocaleString('ko-KR')}</td>
+      <td style="color:${px>=avg?'var(--buy)':'var(--sell)'};font-weight:700">${((px/avg-1)*100).toFixed(1)}%</td></tr>`;
+    box.innerHTML=`<table><thead><tr><th>방식</th><th>투입(만원)</th><th>평단가</th><th>평가(만원)</th><th>수익률</th></tr></thead><tbody>
+      ${row('배속 DCA <span class="man">계기판</span>',cS,qS,avgS)}
+      ${row('균등 DCA · 기본액 동일',cE,qE,avgE)}
+      ${row('균등 DCA · 총액 동일',cF,qF,avgE)}
+    </tbody></table>`;
+
+    // 평단 추이
+    const W=720,H=190,PL=62,PR=16,PT=14,PB=28,n=path.length;
+    const xs=i=>PL+(W-PL-PR)*(n<2?0.5:i/(n-1));
+    const all=path.flatMap(p=>[p.avgS,p.avgE]).concat([px]);
+    const hi=Math.max(...all)*1.01, lo=Math.min(...all)*0.99;
+    const ys=v=>PT+(hi-v)/(hi-lo)*(H-PT-PB);
+    const line=(k,col)=>`<path d="${path.map((p,i)=>(i?'L':'M')+xs(i).toFixed(1)+' '+ys(p[k]).toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="2"/>`;
+    const every=Math.ceil(n/8);
+    $('simChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+      <line x1="${PL}" y1="${ys(px).toFixed(1)}" x2="${W-PR}" y2="${ys(px).toFixed(1)}" stroke="#4A5A68" stroke-dasharray="3 4"/>
+      <text x="${PL-7}" y="${(ys(px)+3).toFixed(1)}" fill="#7C8C9B" font-size="10" font-family="ui-monospace,monospace" text-anchor="end">평가 ${Math.round(px/1000)}k</text>
+      ${line('avgE','#7C8C9B')}${line('avgS','#F5A623')}
+      ${path.map((p,i)=>(i%every===0||i===n-1)?`<text x="${xs(i).toFixed(1)}" y="${H-10}" fill="#7C8C9B" font-size="9.5" font-family="ui-monospace,monospace" text-anchor="middle">${p.date.slice(5)}</text>`:'').join('')}
+    </svg>
+    <div style="display:flex;gap:14px;justify-content:center;margin-top:4px;font-family:var(--mono);font-size:10.5px;color:var(--dim)">
+      <span><span style="display:inline-block;width:14px;height:2px;background:#F5A623;vertical-align:middle"></span> 배속 DCA 평단</span>
+      <span><span style="display:inline-block;width:14px;height:2px;background:#7C8C9B;vertical-align:middle"></span> 균등 DCA 평단</span></div>`;
+
+    const gain=(avgE/avgS-1)*100;
+    const est=recs.filter(r=>r.est).length;
+    $('simRange').textContent=`${recs[0].date} ~ ${lastRec.date} · ${n}주`;
+    $('simNote').innerHTML=`배속 조절이 평단을 <b style="color:${gain>0?'var(--buy)':'var(--sell)'}">${gain>0?'':'+'}${(-gain).toFixed(2)}%</b>`
+      +` ${gain>0?'낮췄습니다':'높였습니다'} — 배속 $${Math.round(avgS).toLocaleString('en-US')} vs 균등 $${Math.round(avgE).toLocaleString('en-US')}.<br>`
+      +`<span style="color:var(--warn)">한계</span> — 표본 ${n}주, 단일 국면입니다. `
+      +`이 기간 배수 범위는 ${Math.min(...recs.map(r=>r.ma?r.price/r.ma:1)).toFixed(2)}~${Math.max(...recs.map(r=>r.ma?r.price/r.ma:1)).toFixed(2)}로 사이클 고점이 없어, `
+      +`감속·중단·익절 경보는 한 번도 검증되지 않았습니다.${est?` 최근 ${est}주는 추정치를 포함합니다.`:''} `
+      +`평단가는 USD 기준이라 환율과 무관하지만, 투입·평가 금액은 <b>환율 고정</b>을 가정합니다. `
+      +`항복존 주차는 1층 DCA ×3으로만 계산했고 <b>3층 예비 탄약은 빼고</b> 계산합니다.`;
+  }
+  ['sim_base','sim_px'].forEach(id=>$(id).addEventListener('input',drawSim));
+
   /* ---------- chart + table ---------- */
-  function drawLog(){
+  function drawLog(){ /* est 표시는 날짜 칸에 붙는다 */
+    try{ drawSim(); }catch(err){ console.error('drawSim',err); }
     $('recCount').textContent=records.length+'건';
     const wrap=$('chartWrap'),tw=$('tableWrap');
-    if(!records.length){wrap.innerHTML='<div class="empty">저장된 기록이 없습니다.<br>「비트코인 채점」 탭에서 저장하거나 백테스트 15주를 불러오세요.</div>';tw.innerHTML='';return;}
+    if(!records.length){wrap.innerHTML='<div class="empty">저장된 기록이 없습니다.<br>「비트코인 채점」 탭에서 저장하거나 백테스트 19주를 불러오세요.</div>';tw.innerHTML='';return;}
     const W=1000,H=250,PL=44,PR=48,PT=16,PB=26,n=records.length;
     const xs=i=>n===1?W/2:PL+i*(W-PL-PR)/(n-1);
     const pV=records.map(r=>r.price),pMin=Math.min(...pV)*.97,pMax=Math.max(...pV)*1.03;
@@ -1353,10 +1471,10 @@
       <span><span style="display:inline-block;width:14px;height:2.5px;background:#F5A623;vertical-align:middle"></span> 매집 점수</span>
       <span><span style="display:inline-block;width:14px;height:2px;background:#7C8C9B;vertical-align:middle"></span> BTC 가격</span></div>`;
     tw.innerHTML=`<table><thead><tr><th>기준일</th><th>가격($)</th><th>MVRV</th><th>공포탐욕</th>
-      <th>A</th><th>B</th><th>C</th><th>D</th><th>총점</th><th style="text-align:right">판정</th><th></th></tr></thead><tbody>${
+      <th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>총점</th><th style="text-align:right">판정</th><th></th></tr></thead><tbody>${
       records.slice().reverse().map(r=>{const c=cssv(tierOf(r.total).color);
-      return `<tr><td>${r.date}</td><td>${Math.round(r.price).toLocaleString('ko-KR')}</td><td>${(r.mvrv??0).toFixed(2)}</td><td>${r.fg??'—'}</td>
-        <td>${r.A}</td><td>${r.B}</td><td>${r.C}</td><td>${r.D}</td>
+      return `<tr><td>${r.date}${r.est?` <span title="${r.est}" style="color:var(--warn);cursor:help">추정</span>`:''}</td><td>${Math.round(r.price).toLocaleString('ko-KR')}</td><td>${(r.mvrv??0).toFixed(2)}</td><td>${r.fg??'—'}</td>
+        <td>${r.A}</td><td>${r.B}</td><td>${r.C}</td><td>${r.D}</td><td>${r.E??'—'}</td>
         <td style="color:${c};font-weight:700">${r.total}</td><td style="text-align:right;color:${c}">${r.tier}</td>
         <td style="text-align:right;white-space:nowrap"><button class="mini edit" data-load="${r.date}">수정</button>
         <button class="mini" data-del2="${r.date}">×</button></td></tr>`;}).join('')}</tbody></table>`;
@@ -1489,7 +1607,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       links:{fx:+$('i_fx').value,up:+$('i_upbit').value,bi:+$('i_bithumb').value,bn:+$('i_binance').value},
       usdtd:+$('m_usdtd').value,
       flows,
-      draft:(()=>{const o={};Object.keys(RAWMAP).forEach(k=>o[k]=$(RAWMAP[k]).value);
+      draft:(()=>{const o={_fed0916:1};Object.keys(RAWMAP).forEach(k=>o[k]=$(RAWMAP[k]).value);
         o._base=$('i_base').value; o._fetched=lastFetch||''; return o;})(),nav:+$('i_nav').value,cash:+$('i_cash').value},null,2));
   };
 
@@ -1609,7 +1727,8 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
 
   /* ---------- daily check ---------- */
   const DAYKEY='btcscore:daily';
-  let daily=[], hyNow=null;
+  let daily=[], hyNow=null, dailyReady=false;
+  let booted=false;   /* 복원 완료 전 렌더가 기본값으로 저장소를 덮어쓰는 것을 막는다 */
 
   const cmpUSD=v=>{const a=Math.abs(v);
     return a>=1e9?(v/1e9).toFixed(2)+'B':a>=1e6?(v/1e6).toFixed(1)+'M':Math.round(v).toLocaleString('ko-KR');};
@@ -1628,9 +1747,50 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       <div class="t">${title} <em>${sub}</em></div>
       <div class="s" style="color:var(${c});font-size:12px">${val}</div></div>`;
   }
+
+  /* 기준일이 바뀌면 그 날짜의 저장 기록을 입력란에 실어 준다.
+     기록이 없는 날짜면 이벤트성 값(ETF·순입출금·뉴스)만 비우고,
+     연속 지표(펀딩·HY·브렌트·10년물)는 직전 기록에서 이월한다. */
+  let _loadingDaily=false;
+  function loadDailyInputs(){
+    if(_loadingDaily) return;
+    _loadingDaily=true;
+    try{
+      const date=$('d_date').value||new Date().toISOString().slice(0,10);
+      const rec=daily.find(x=>x.date===date);
+      const prev=daily.filter(x=>x.date<date).sort((a,b)=>a.date<b.date?1:-1)[0];
+      const put=(id,v,dp)=>{
+        if(v==null||v===''||(typeof v!=='string'&&isNaN(v))) return false;
+        $(id).value = dp==null ? String(v) : (+v).toFixed(dp);
+        return true;
+      };
+      if(rec){
+        $('d_senti').value= String(rec.senti??0);
+        put('d_fund',rec.funding,4); put('d_hy',rec.hy,2);
+        if(!put('d_loss',rec.loss,2)) $('d_loss').value='';
+      }else{
+        $('d_senti').value='0';
+        if(prev){ put('d_fund',prev.funding,4); put('d_hy',prev.hy,2); put('d_loss',prev.loss,2); }
+      }
+      const today=new Date().toISOString().slice(0,10);
+      const el=$('dDateState');
+      if(rec){
+        el.style.color='var(--warn)';
+        el.textContent=`저장된 기록 · 저장 시 덮어씀${date===today?'':' · 오늘 아님'}`;
+      }else{
+        el.style.color= date===today?'var(--dim)':'var(--warn)';
+        el.textContent= date===today ? '신규 입력'
+          : `신규 입력 · 오늘(${today}) 아님${prev?' · 연속 지표는 '+prev.date+'에서 이월':''}`;
+      }
+      $('btnDSave').textContent = rec ? `${date} 덮어쓰기` : `${date} 기록 저장`;
+    } finally { _loadingDaily=false; }
+    renderDaily();
+  }
+
   function renderDaily(){
     const date=$('d_date').value||new Date().toISOString().slice(0,10);
-    const etf=+$('d_etf').value||0, f=+$('d_fund').value, hy=+$('d_hy').value;
+    const _rec=daily.find(x=>x.date===date)||{};
+    const etf=+_rec.etf||0, f=+$('d_fund').value, hy=+$('d_hy').value;
     hyNow=isNaN(hy)?null:hy;
     const list=daily.filter(x=>x.date!==date).concat([{date,etf,funding:f,hy}]).sort((a,b)=>a.date<b.date?-1:1);
     void 0;
@@ -1661,7 +1821,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     else if(hy<4.0){hS='warn';hT='경고';}
     else {hS='ok';hT='항복존';}
 
-    const flow=+$('d_flow').value||0;
+    const flow=+_rec.flow||0;
     let nS,nT;
     if(flow<-500){nS='ok';nT='대규모 유출 · 축적';}
     else if(flow<0){nS='ok';nT='유출 · 축적';}
@@ -1669,66 +1829,90 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     else if(flow<500){nS='warn';nT='유입 · 분배';}
     else {nS='alarm';nT='대규모 유입 · 분배';}
 
+    const numv=id=>{const t=$(id).value; return (t===''||t==null)?NaN:+t;};
+    const prevOf=k=>{const r=daily.filter(x=>x.date<date&&x[k]!=null&&!isNaN(x[k])).sort((a,b)=>a.date<b.date?1:-1)[0];return r?r[k]:null;};
+    const pL=prevOf('loss');
+    // 손실 중인 공급량 — 많을수록 항복(매집 유리). 구간 근거: 19주 실측 5.57~10.58M, 수기 임계 8.2M
+    const loss=numv('d_loss');
+    let lS,lT;
+    if(isNaN(loss)){lS='dim';lT='—';}
+    else if(loss>=10.0){lS='ok';lT='항복 심화';}
+    else if(loss>=8.2){lS='ok';lT='항복 구간';}
+    else if(loss>=7.0){lS='dim';lT='중립';}
+    else {lS='warn';lT='손실 공급 소진';}
+    const lCh=(!isNaN(loss)&&pL)?(loss/pL-1)*100:null;
+    const lD=lCh===null?'':` · 직전 대비 ${(lCh>0?'+':'')+lCh.toFixed(1)}%`;
     $('dLamps').innerHTML =
       lamp('ETF 수급', eT+sumTxt, eS, (etf>0?'+':'')+etf.toLocaleString('ko-KR')+' BTC') +
       lamp('펀딩비', fT+' · 8시간', fS, isNaN(f)?'—':f.toFixed(4)+'%') +
       lamp('HY 스프레드', hT+' · 경계 3.5 / 항복 4.0', hS, isNaN(hy)?'—':hy.toFixed(2)+'%') +
-      lamp('거래소 순입출금', nT+' · 유출이 강세', nS, (flow>0?'+':'')+flow.toLocaleString('ko-KR')+' BTC');
+      lamp('손실 중인 공급량 <span class="man">참고</span>', lT+lD, lS, isNaN(loss)?'—':loss.toFixed(2)+'M');
 
     const fl=[];
     if(!isNaN(hy)&&hy>=4.0) fl.push(`<div class="flag ok"><b>항복존 도달</b> — HY 스프레드 ${hy.toFixed(2)}%. 3층 예비 탄약 개방 조건이 충족됐습니다.</div>`);
     else if(!isNaN(hy)&&hy>=3.5) fl.push(`<div class="flag warn"><b>매크로 경고</b> — HY 스프레드 ${hy.toFixed(2)}%. 신용 스트레스가 시작되는 구간입니다.</div>`);
     if(st.dir<0&&st.n>=3) fl.push(`<div class="flag warn"><b>ETF 이탈</b> — ${st.n}일 연속 유출, 누적 ${Math.round(Math.abs(st.sum)).toLocaleString('ko-KR')} BTC. 주간 C 수급 점수 하락이 예상됩니다.</div>`);
     if(!isNaN(f)&&f>0.10) fl.push(`<div class="flag warn"><b>레버리지 과열</b> — 펀딩비 ${f.toFixed(4)}%. 롱 청산 연쇄 위험 구간입니다.</div>`);
-    if(!fl.length) fl.push('<div class="flag ok">세 지표 모두 정상 범위입니다.</div>');
+    if(lCh!==null&&lCh>=8)
+      fl.push(`<div class="flag ok"><b>손실 공급량 급증</b> — ${pL}M → ${loss}M (+${lCh.toFixed(1)}%). 항복 매도 가능성. <span style="color:var(--dim)">19주 표본 5회뿐이라 근거는 약합니다 · 참고 지표 · 채점 제외</span></div>`);
+    if(!fl.length) fl.push('<div class="flag ok">모든 지표가 정상 범위입니다.</div>');
     $('dFlags').innerHTML=fl.join('');
 
     const recent=daily.slice().sort((a,b)=>a.date<b.date?1:-1).slice(0,14);
     $('dCount').textContent=daily.length+'건';
     $('dTable').innerHTML = recent.length
-      ? `<table><thead><tr><th>날짜</th><th>ETF(BTC)</th><th>ETF(USD)</th><th>펀딩비%</th><th>HY%</th><th>순입출금</th><th>뉴스</th></tr></thead><tbody>${
+      ? `<table><thead><tr><th>날짜</th><th>ETF(BTC)</th><th>ETF(USD)</th><th>펀딩비%</th><th>HY%</th><th>손실M</th><th>뉴스</th></tr></thead><tbody>${
           recent.map(r=>`<tr><td>${r.date}</td>
             <td style="color:${r.etf>0?'var(--buy)':(r.etf<0?'var(--sell)':'var(--dim)')}">${(r.etf>0?'+':'')+(r.etf||0).toLocaleString('ko-KR')}</td>
             <td style="color:${(r.etfUsd||0)>0?'var(--buy)':((r.etfUsd||0)<0?'var(--sell)':'var(--dim)')}">${r.etfUsd==null?'—':((r.etfUsd>0?'+':'')+cmpUSD(r.etfUsd))}</td>
             <td>${r.funding==null||isNaN(r.funding)?'—':r.funding.toFixed(4)}</td>
             <td style="color:${r.hy>=3.5?'var(--warn)':'var(--text)'}">${r.hy==null||isNaN(r.hy)?'—':r.hy.toFixed(2)}</td>
-            <td style="color:${(r.flow||0)<0?'var(--buy)':((r.flow||0)>0?'var(--sell)':'var(--dim)')}">${r.flow==null?'—':((r.flow>0?'+':'')+r.flow.toLocaleString('ko-KR'))}</td>
+            <td style="color:${r.loss>=8.2?'var(--buy)':(r.loss<7?'var(--warn)':'var(--text)')}">${r.loss==null||isNaN(r.loss)?'—':(+r.loss).toFixed(2)}</td>
             <td style="color:${(r.senti||0)>0?'var(--buy)':((r.senti||0)<0?'var(--sell)':'var(--dim)')}">${r.senti>0?'호재':(r.senti<0?'악재':'—')}</td></tr>`).join('')}</tbody></table>`
       : '<div class="empty">저장된 일일 기록이 없습니다.</div>';
-    sSet(DAYKEY,JSON.stringify(daily));
     try{ drawFlow(); }catch(err){ console.error('drawFlow',err); }
   }
 
 
   /* ---------- 일일 자금 흐름 그래프 ---------- */
-  let fcState={src:'etf',unit:'btc',days:30};
+  let fcState={src:'BTC',unit:'btc',days:30};
   const fcFmt=(v,unit)=> unit==='usd'
       ? (v>0?'+':v<0?'-':'')+'$'+cmpUSD(Math.abs(v))
+      : unit==='raw' ? (v>0?'+':v<0?'-':'')+cmp(Math.abs(v))
       : (v>0?'+':'')+Math.round(v).toLocaleString('ko-KR')+' BTC';
   function drawFlow(){
     const box=$('fcChart'); if(!box) return;
-    const {src,unit,days}=fcState;
-    document.querySelectorAll('[data-fsrc]').forEach(b=>b.classList.toggle('on',b.dataset.fsrc===src));
+    let {src,unit,days}=fcState;
+    // 자산 버튼: BTC(ETF 표 붙여넣기 기록) + 자산별 표로 등록된 자산들
+    const assets=['BTC'].concat(Object.keys(flows||{}).filter(k=>k!=='BTC').sort());
+    if(!assets.includes(src)){ src='BTC'; fcState.src='BTC'; }
+    $('fcAssets').innerHTML=assets.map(a=>`<button data-fsrc="${a}"${a===src?' class="on"':''}>${a}</button>`).join('');
     document.querySelectorAll('[data-funit]').forEach(b=>b.classList.toggle('on',b.dataset.funit===unit));
     document.querySelectorAll('[data-fdays]').forEach(b=>b.classList.toggle('on',+b.dataset.fdays===days));
+    const isBTC = src==='BTC';
+    // BTC만 BTC수량/USD 두 단위를 갖는다. 다른 자산은 붙여넣은 단위 그대로 쓴다.
+    [$('fcUnitBtc'),$('fcUnitUsd')].forEach(b=>{ if(b) b.style.display=isBTC?'':'none'; });
+    if(!isBTC) unit='raw';
 
-    if(src==='flow'&&unit==='usd'){
-      box.innerHTML='<div class="empty">거래소 순입출금은 BTC 수량만 기록됩니다. 금액 환산 데이터가 없습니다.</div>';
-      $('fcSum').textContent='—'; $('fcRange').textContent='—'; return;
+    let list;
+    if(isBTC){
+      const val=r=> unit==='usd' ? (r.etfUsd==null?null:+r.etfUsd) : (+r.etf||0);
+      list=daily.slice().sort((a,b)=>a.date<b.date?-1:1)
+        .filter(r=>val(r)!==null).map(r=>({date:r.date,v:val(r)}));
+    }else{
+      list=(((flows[src]||{}).rows)||[]).slice().sort((a,b)=>a.date<b.date?-1:1)
+        .map(r=>({date:r.date,v:+r.etf||0}));
     }
-    const val=r=> src==='etf' ? (unit==='usd'? (r.etfUsd==null?null:+r.etfUsd) : (+r.etf||0))
-                              : (+r.flow||0);
-    let list=daily.slice().sort((a,b)=>a.date<b.date?-1:1).filter(r=>val(r)!==null);
     if(days>0) list=list.slice(-days);
     if(!list.length){
-      box.innerHTML='<div class="empty">'+(src==='etf'&&unit==='usd'
+      box.innerHTML='<div class="empty">'+(isBTC&&unit==='usd'
         ? 'USD 금액 기록이 없습니다. 「ETF 표 붙여넣기」 단위를 USD로 두고 반영하면 쌓입니다.'
-        : '저장된 일일 기록이 없습니다.')+'</div>';
+        : (isBTC?'저장된 BTC ETF 기록이 없습니다. 아래 「ETF 표 붙여넣기」로 채우십시오.'
+                :`${src} 기록이 없습니다. 위 「자산별 ETF 표 붙여넣기」로 채우십시오.`))+'</div>';
       $('fcSum').textContent='—'; $('fcRange').textContent='—'; return;
     }
-    // 강세 방향: ETF는 유입(+), 거래소는 유출(-)이 축적
-    const good=v=> src==='etf' ? v>0 : v<0;
-    const vals=list.map(val);
+    const good=v=> v>0;   // ETF는 유입(+)이 강세
+    const vals=list.map(r=>r.v);
     let cum=0; const cums=vals.map(v=>(cum+=v));
     const W=760,H=252,PL=58,PR=62,PT=16,PB=34,n=list.length;
     const iw=(W-PL-PR)/Math.max(n,1);
@@ -1748,7 +1932,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       return `<rect x="${(xc(i)-bw/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}"
         fill="${col}" opacity="${v===0?0.5:0.85}"><title>${r.date} · ${fcFmt(v,unit)} · 누적 ${fcFmt(cums[i],unit)}</title></rect>`;}).join('');
     const cpath=cums.map((v,i)=>(i?'L':'M')+xc(i).toFixed(1)+' '+yc(v).toFixed(1)).join(' ');
-    const shortN=v=> unit==='usd'? cmpUSD(v) : Math.round(v).toLocaleString('ko-KR');
+    const shortN=v=> unit==='usd'? cmpUSD(v) : (unit==='raw'? cmp(v) : Math.round(v).toLocaleString('ko-KR'));
     const gl=[hi,(hi+lo)/2,0,lo].filter((v,i,a)=>a.indexOf(v)===i).map(v=>
       `<line x1="${PL}" y1="${y(v).toFixed(1)}" x2="${W-PR}" y2="${y(v).toFixed(1)}"
          stroke="${Math.abs(v)<1e-9?'#4A5A68':'#232E37'}" stroke-dasharray="${Math.abs(v)<1e-9?'':'3 4'}"/>
@@ -1761,14 +1945,14 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
       ${gl}${bars}<path d="${cpath}" fill="none" stroke="#F5A623" stroke-width="2" opacity=".9"/>${cax}${xl}</svg>
       <div style="display:flex;gap:14px;justify-content:center;margin-top:5px;font-family:var(--mono);font-size:10.5px;color:var(--dim);flex-wrap:wrap">
-        <span><span style="display:inline-block;width:11px;height:9px;background:var(--buy);vertical-align:middle"></span> ${src==='etf'?'유입(강세)':'유출 · 축적(강세)'}</span>
-        <span><span style="display:inline-block;width:11px;height:9px;background:var(--sell);vertical-align:middle"></span> ${src==='etf'?'유출(약세)':'유입 · 분배(약세)'}</span>
+        <span><span style="display:inline-block;width:11px;height:9px;background:var(--buy);vertical-align:middle"></span> ${src} 유입(강세)</span>
+        <span><span style="display:inline-block;width:11px;height:9px;background:var(--sell);vertical-align:middle"></span> ${src} 유출(약세)</span>
         <span><span style="display:inline-block;width:14px;height:2px;background:#F5A623;vertical-align:middle"></span> 누적(오른쪽 축)</span></div>`;
 
     const tot=vals.reduce((a,b)=>a+b,0);
     const up=vals.filter(v=>good(v)).length, dn=vals.filter(v=>v!==0&&!good(v)).length;
     const mx=list[vals.indexOf(Math.max(...vals))], mn=list[vals.indexOf(Math.min(...vals))];
-    $('fcRange').textContent=`${list[0].date} ~ ${list[n-1].date} · ${n}일`;
+    $('fcRange').textContent=`${src} · ${list[0].date} ~ ${list[n-1].date} · ${n}일`;
     $('fcSum').innerHTML=`기간 합계 <b style="color:${good(tot)?'var(--buy)':'var(--sell)'}">${fcFmt(tot,unit)}</b>`
       +` · 강세일 <b style="color:var(--buy)">${up}</b> / 약세일 <b style="color:var(--sell)">${dn}</b>`
       +` · 최대 유입 <b>${fcFmt(Math.max(...vals),unit)}</b> (${mx.date})`
@@ -1783,16 +1967,27 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
 
   $('btnDSave').onclick=async()=>{
     const date=$('d_date').value||new Date().toISOString().slice(0,10);
+    const _nv=id=>{const t=$(id).value;return t===''?null:+t;};
+    const _old=daily.find(x=>x.date===date)||{};
     daily=daily.filter(x=>x.date!==date);
-    daily.push({date,etf:+$('d_etf').value||0,funding:+$('d_fund').value,hy:+$('d_hy').value,flow:+$('d_flow').value||0,senti:+$('d_senti').value||0});
+    daily.push({date,etf:_old.etf??0,etfUsd:_old.etfUsd??null,funding:+$('d_fund').value,hy:+$('d_hy').value,
+      loss:_nv('d_loss'),flow:_old.flow??0,senti:+$('d_senti').value||0});
     daily.sort((a,b)=>a.date<b.date?-1:1);
-    await sSet(DAYKEY,JSON.stringify(daily));
-    renderDaily(); fillEtfFromDaily(true); render();
+    if(dailyReady) await sSet(DAYKEY,JSON.stringify(daily));
+    loadDailyInputs(); fillEtfFromDaily(true); render();
     toast(`${date} 일일 기록 저장`,'var(--ok)','toast3');
   };
 
+
+  const stamp=()=>{const n=new Date();return `${n.getMonth()+1}/${n.getDate()} `+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');};
   $('btnDFetch').onclick=async()=>{
     const b=$('btnDFetch'); b.disabled=true; b.textContent='불러오는 중…';
+    let _dateNote='';
+    {const today=new Date().toISOString().slice(0,10);
+     if($('d_date').value&&$('d_date').value!==today){
+       const was=$('d_date').value; $('d_date').value=today; loadDailyInputs();
+       _dateNote=`<span style="color:var(--warn)">▲</span> 기준일을 ${was} → ${today}(오늘)로 되돌렸습니다. 자동 불러오기는 현재 시세입니다.`;
+     }}
     const log=[];
     const cg=$('d_cgkey').value.trim();
     if(cg){
@@ -1827,7 +2022,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
             if(btc===null && px>0) ex.etf=Math.round(usd/px); }
         });
         daily.sort((x,y)=>x.date<y.date?-1:1);
-        await sSet(DAYKEY,JSON.stringify(daily));
+        if(dailyReady) await sSet(DAYKEY,JSON.stringify(daily));
         sSet('btcscore:cgkey',cg);
         log.push(`<span style="color:var(--ok)">✓</span> CoinGlass v4 ETF · ${arr.length}일`
           +(nBtc?` · BTC ${nBtc}건`:'')+(nUsd?` · USD ${nUsd}건`:'')
@@ -1846,18 +2041,22 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       const p=await jget('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT');
       const fr=parseFloat(p.lastFundingRate)*100;
       $('d_fund').value=fr.toFixed(4);
+      $('srcFund').innerHTML=`8시간 기준 · Binance <b style="color:var(--ok)">조달 ${stamp()}</b>`;
       log.push(`<span style="color:var(--ok)">✓</span> 펀딩비 · ${fr.toFixed(4)}%`);
-    }catch(e){ log.push('<span style="color:var(--alarm)">✗</span> 펀딩비 실패 — 직접 입력하십시오'); }
+    }catch(e){ $('srcFund').innerHTML='8시간 기준 · Binance <b style="color:var(--alarm)">조달 실패 — 화면값은 직접 확인</b>';
+      log.push('<span style="color:var(--alarm)">✗</span> 펀딩비 실패 — 직접 입력하십시오'); }
     try{
       const txt=await textVia('https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2');
       const rows=txt.trim().split('\n').slice(1)
         .map(l=>l.split(',')).filter(c=>c[1]&&c[1].trim()!=='.'&&!isNaN(+c[1]));
       const last=rows[rows.length-1];
       $('d_hy').value=(+last[1]).toFixed(2);
+      $('srcHy').innerHTML=`FRED BAMLH0A0HYM2 · <b style="color:var(--ok)">${last[0]} 종가 조달</b>`;
       log.push(`<span style="color:var(--ok)">✓</span> HY 스프레드 · ${(+last[1]).toFixed(2)}% (${last[0]})`);
-    }catch(e){ log.push('<span style="color:var(--alarm)">✗</span> HY 스프레드 실패 — FRED에서 확인 후 직접 입력하십시오'); }
+    }catch(e){ $('srcHy').innerHTML='FRED BAMLH0A0HYM2 · <b style="color:var(--alarm)">조달 실패 — 화면값은 불러온 값이 아닙니다</b>';
+      log.push(`<span style="color:var(--alarm)">✗</span> HY 스프레드 실패 — 화면의 ${$('d_hy').value}%는 <b>불러온 값이 아닙니다</b>. 3층 항복 조건(4.0%)이 이 값을 씁니다. FRED에서 확인 후 직접 입력하십시오`); }
     log.push('<span style="color:var(--dim)">ETF 일일 순유입은 직접 입력하십시오.</span>');
-    $('dFetchLog').innerHTML=log.join('<br>');
+    $('dFetchLog').innerHTML=(_dateNote?[_dateNote].concat(log):log).join('<br>');
     $('dFetchTime').textContent=new Date().toLocaleString('ko-KR',{hour12:false}).slice(0,16);
     lastDFetch=new Date().toISOString(); sSet('btcscore:dfetch',lastDFetch);
     b.disabled=false; b.textContent='자동 불러오기';
@@ -1934,7 +2133,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
              daily.push(o); add++; }
     });
     daily.sort((a,b)=>a.date<b.date?-1:1);
-    await sSet(DAYKEY,JSON.stringify(daily));
+    if(dailyReady) await sSet(DAYKEY,JSON.stringify(daily));
     renderDaily(); fillEtfFromDaily(true); render(); freshness();
     const s0=rows[rows.length-1], e0=rows[0];
     $('pasteLog').innerHTML=`<span style="color:var(--ok)">✓ ${rows.length}행 반영 (${unit==='usd'?'USD 금액':'BTC 수량'})</span> — 신규 ${add} · 갱신 ${upd}`
@@ -2058,7 +2257,8 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
           +'추세 분석의 <b>주식 조회</b>와 일일 점검의 <b>HY 스프레드</b>도 실패한다면 네트워크 차단이니, 아래 바로가기를 쓰십시오.');
     b.disabled=false; b.textContent='불러오기';
   };
-  ['d_date','d_etf','d_fund','d_hy','d_flow','d_senti'].forEach(id=>$(id).addEventListener('input',renderDaily));
+  ['d_fund','d_hy','d_loss','d_senti'].forEach(id=>$(id).addEventListener('input',renderDaily));
+  ['input','change'].forEach(ev=>$('d_date').addEventListener(ev,loadDailyInputs));
 
   /* ---------- 현재가 자동 갱신 ---------- */
   function tickerOf(r){
@@ -2175,7 +2375,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     if(dca<=0) f.push(`<div class="flag warn"><b>DCA 배정 0</b> — 가격이 사다리까지 안 빠지면 1년 내내 한 주도 못 삽니다. 최소 15%는 남기십시오.</div>`);
     if(!f.length) f.push('<div class="flag ok">전 구간 대기 중 · 배분 정상</div>');
     $('ladFlags').innerHTML=f.join('');
-    sSet(LADKEY,JSON.stringify({total:totIn,dca,res,lad}));
+    if(booted) sSet(LADKEY,JSON.stringify({total:totIn,dca,res,lad}));
   }
 
   $('ladBody').addEventListener('input',e=>{
@@ -2186,7 +2386,10 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   });
   $('ladBody').addEventListener('change',e=>{ if(e.target.dataset.lf==='done'){
     const tr=e.target.closest('tr'); lad[+tr.dataset.l].done=e.target.checked; renderLadder(); }});
-  ['l_total','l_dca','l_res'].forEach(id=>$(id).addEventListener('input',renderLadder));
+  ['l_total','l_dca','l_res'].forEach(id=>{
+    $(id).addEventListener('input',renderLadder);
+    $(id).addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnLadSave').click(); });
+  });
   $('btnLadSave').onclick=async()=>{
     renderLadder();
     await sSet(LADKEY,JSON.stringify({total:+$('l_total').value,dca:+$('l_dca').value,res:+$('l_res').value,lad}));
@@ -2300,6 +2503,47 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
   }
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
+
+  /* ---------- 추세 판정 이력 ----------
+     분석 결과는 새로고침하면 사라지던 것을, 저장소에 남겨 다시 열어도 보이게 한다.
+     같은 종목·같은 날짜는 덮어쓰고, 종목당 60건·전체 1000건으로 제한한다. */
+  const TRLOGKEY='btcscore:trendlog';
+  let trLog=[];
+  const trKeyOf=r=>`${r.sym}|${r.date}`;
+  function trLogPush(r){
+    if(!r||r.err) return;
+    const date=new Date().toISOString().slice(0,10);
+    const e={sym:r.sym,kind:r.kind,date,ts:new Date().toISOString(),px:r.px,
+      arr:r.arr,dx:r.dx,wx:r.wx,mx:r.mx,verdict:r.verdict,state:r.state};
+    trLog=trLog.filter(x=>trKeyOf(x)!==trKeyOf(e));
+    trLog.unshift(e);
+    const cnt={}; trLog=trLog.filter(x=>{cnt[x.sym]=(cnt[x.sym]||0)+1; return cnt[x.sym]<=60;}).slice(0,1000);
+  }
+  async function trLogSave(){ try{ await sSet(TRLOGKEY,JSON.stringify(trLog)); }catch(e){} }
+  function renderTrLog(){
+    const box=$('trLogTable'); if(!box) return;
+    const sel=$('trLogSel'), cur=sel.value;
+    const syms=[...new Set(trLog.map(r=>r.sym))].sort();
+    sel.innerHTML='<option value="">전체</option>'+syms.map(x=>`<option value="${x}">${x}</option>`).join('');
+    sel.value=syms.includes(cur)?cur:'';
+    const list=(sel.value?trLog.filter(r=>r.sym===sel.value):trLog).slice(0,200);
+    $('trLogCount').textContent=`${trLog.length}건${sel.value?` · ${sel.value} ${trLog.filter(r=>r.sym===sel.value).length}건`:''}`;
+    if(!list.length){ box.innerHTML='<div class="empty">아직 저장된 판정이 없습니다. 위에서 분석하면 자동으로 쌓입니다.</div>'; return; }
+    const col={ok:'var(--ok)',warn:'var(--warn)',alarm:'var(--alarm)',dim:'var(--dim)'};
+    box.innerHTML=`<table class="ptab"><thead><tr>
+      <th style="min-width:84px">날짜</th><th style="min-width:64px">종목</th><th style="min-width:80px">가격</th>
+      <th style="min-width:64px">일봉 배열</th><th style="min-width:86px">일봉 5–60</th>
+      <th style="min-width:86px">주봉 5–20</th><th style="min-width:92px">월봉 15WMA</th>
+      <th style="min-width:76px">종합</th><th style="min-width:34px"></th></tr></thead><tbody>${
+      list.map(r=>`<tr><td style="text-align:left;white-space:nowrap">${r.date}</td>
+        <td style="text-align:left">${r.sym}</td>
+        <td>${r.px>=100?r.px.toLocaleString('en-US',{maximumFractionDigits:2}):(+r.px).toPrecision(4)}</td>
+        <td style="color:var(--dim)">${r.arr}</td><td style="color:var(--dim)">${r.dx}</td>
+        <td style="color:var(--dim)">${r.wx}</td><td style="color:var(--dim)">${r.mx}</td>
+        <td style="color:${col[r.state]||'var(--dim)'};font-weight:700">${r.verdict}</td>
+        <td><button class="mini" data-trdel="${r.sym}|${r.date}">×</button></td></tr>`).join('')}</tbody></table>`;
+  }
+
   let trResults=[];
   function renderTr(){
     const col={ok:'var(--ok)',warn:'var(--warn)',alarm:'var(--alarm)',dim:'var(--dim)'};
@@ -2323,13 +2567,17 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
             <td style="color:${col[r.state]};font-weight:700">${r.verdict}</td>
             <td><button class="mini" data-tdel="${i}">×</button></td></tr>`).join('')}</tbody></table>`;
     $('trCount').textContent=`${trResults.filter(r=>!r.err).length} / ${trResults.length}종목 판정`;
-    $('trTime').textContent=new Date().toLocaleString('ko-KR',{hour12:false}).slice(0,16);
+    if(trResults.some(r=>r.at)) $('trTime').textContent=trResults.find(r=>r.at).at;
+    if(booted) sSet('btcscore:trendcur',JSON.stringify(trResults.slice(0,40)));
   }
   $('trTable').addEventListener('click',e=>{
     const i=e.target.dataset.tdel; if(i===undefined)return;
     trResults.splice(+i,1); renderTr();
   });
-  function pushRes(r){ if(!r)return; trResults=trResults.filter(x=>x.sym!==r.sym); trResults.unshift(r); }
+  function pushRes(r){ if(!r)return;
+    r.at=new Date().toLocaleString('ko-KR',{hour12:false}).slice(0,16);
+    trResults=trResults.filter(x=>x.sym!==r.sym); trResults.unshift(r);
+    trLogPush(r); }
 
   async function analyzeOne(sym,kind,key){
     sym=(sym||'').trim().toUpperCase(); if(!sym)return null;
@@ -2394,10 +2642,20 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     const b=$('btnOne'); b.disabled=true; b.textContent='분석 중…';
     pushRes(await analyzeOne(sym,trGroup,$('tr_key').value.trim()));
     renderTr(); showGate(); showSat(); saveTr();
+    await trLogSave(); renderTrLog();
     b.disabled=false; b.textContent='선택 종목 분석';
   };
   $('tr_one').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnOne').click(); });
   $('btnClearTr').onclick=()=>{ trResults=[]; renderTr(); };
+  $('trLogSel').addEventListener('change',renderTrLog);
+  $('trLogTable').addEventListener('click',e=>{
+    const k=e.target.dataset.trdel; if(!k)return;
+    trLog=trLog.filter(x=>`${x.sym}|${x.date}`!==k); trLogSave(); renderTrLog();
+  });
+  $('btnTrLogClear').onclick=async()=>{
+    if(!trLog.length) return;
+    trLog=[]; await trLogSave(); renderTrLog(); toast('판정 이력을 비웠습니다.','var(--ok)');
+  };
 
   $('btnTrend').onclick=async()=>{
     const b=$('btnTrend'); b.disabled=true;
@@ -2411,8 +2669,9 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
       renderTr(); showGate(); showSat();
       await sleep(250);
     }
+    await trLogSave(); renderTrLog();
     b.disabled=false; b.textContent='이 탭 전체 분석';
-    toast(`${list.length}종목 분석 완료`,'var(--ok)','toast4');
+    toast(`${list.length}종목 분석 완료 · 이력 저장`,'var(--ok)','toast4');
   };
 
   function fillEtfFromDaily(auto){
@@ -2456,7 +2715,7 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
     const both=(dc==='buy'&&uc==='buy');
     $('macroTag').textContent = both?'동시 매집 신호':`${dv} · ${uv}`;
     $('macroTag').style.color = both?'var(--buy)':'var(--dim)';
-    sSet('btcscore:usdtd',String(ud));
+    if(booted) sSet('btcscore:usdtd',String(ud));
   }
   if($('m_usdtd')) $('m_usdtd').addEventListener('input',renderMacro);
 
@@ -2498,7 +2757,8 @@ ${sheet('주간기록',s1)}${sheet('포트폴리오',s2)}${sheet('채점기준',
           <td>${f.n||'—'}</td><td style="color:var(--dim)">${f.from||''}~${f.to||''}</td>
           <td style="color:${COL[c]};font-weight:700">${v}</td>
           <td><button class="mini" data-fdel="${k}">×</button></td></tr>`;}).join('')}</tbody></table>`;
-    sSet(FLOWKEY,JSON.stringify(flows));
+    if(booted) sSet(FLOWKEY,JSON.stringify(flows));
+    try{ drawFlow(); }catch(e){}
   }
   $('flowTable').addEventListener('click',e=>{
     const k=e.target.dataset.fdel;
