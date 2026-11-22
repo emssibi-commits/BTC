@@ -1,0 +1,5 @@
+{
+  "_설명": "감시할 종목. 코인은 Yahoo에서 'BTC-USD' 형태로 조회하므로 심볼만 적습니다. 보유 종목이 바뀌면 이 파일을 고쳐 커밋하십시오.",
+  "coins":  ["BTC", "ETH", "SOL", "XRP", "LINK", "UNI", "ONDO", "XLM", "ENA"],
+  "stocks": ["COIN", "HOOD", "CRCL", "BMNR"]
+}
