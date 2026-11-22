@@ -1,0 +1,42 @@
+name: 추세 크로스 알림
+
+on:
+  schedule:
+    # 매일 00:30 UTC = 09:30 KST. 월요일 주봉 마감(09:00 KST) 직후를 포함한다.
+    - cron: '30 0 * * *'
+  workflow_dispatch:        # 저장소 Actions 탭에서 수동 실행
+
+permissions:
+  contents: write           # 상태 파일(data/alert-state.json) 커밋용
+
+concurrency:
+  group: cross-alert
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 크로스 검사 및 알림
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/cross-alert.mjs
+
+      - name: 상태 저장
+        run: |
+          if git diff --quiet -- data/alert-state.json; then
+            echo "상태 변화 없음 — 커밋하지 않음"
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/alert-state.json
+            git commit -m "chore: 추세 상태 갱신 $(date -u +%Y-%m-%d)"
+            git push
+          fi
