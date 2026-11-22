@@ -122,9 +122,17 @@ async function main() {
   const prev = await readJson(STATE, {});
   const next = {}, hits = [], failed = [];
 
+  // 코인은 보통 'BTC' → 'BTC-USD' 로 붙이지만, Yahoo 는 심볼이 겹치면 숫자를 붙인다
+  // (Uniswap = UNI7083-USD). '-' 가 들어 있으면 그 심볼을 그대로 쓰고,
+  // 표시 이름은 앞부분에서 꼬리 숫자를 떼어 쓴다.
+  const coin = s => {
+    if (!s.includes('-')) return { sym: s, yf: `${s}-USD`, kind: '코인' };
+    const head = s.split('-')[0];
+    return { sym: head.replace(/\d+$/, '') || head, yf: s, kind: '코인' };
+  };
   const list = [
-    ...(wl.coins  || []).map(s => ({ sym: s, yf: `${s}-USD`, kind: '코인' })),
-    ...(wl.stocks || []).map(s => ({ sym: s, yf: s,          kind: '주식' })),
+    ...(wl.coins  || []).map(coin),
+    ...(wl.stocks || []).map(s => ({ sym: s, yf: s, kind: '주식' })),
   ];
   if (!list.length) { console.error('watchlist 가 비었습니다.'); process.exit(1); }
 
